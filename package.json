@@ -15,15 +15,19 @@
     "build:teacher": "cross-env VITE_EDITION=teacher electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+    "sample:pack": "node scripts/build-sample-pack.mjs",
     "pack:dir": "electron-builder --dir",
     "pack:mac": "electron-builder --mac dir",
     "pack:win": "electron-builder --win dir"
   },
   "dependencies": {
+    "jszip": "^3.10.2",
+    "mysql2": "^3.24.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@types/jszip": "^3.4.0",
     "@types/node": "^24.7.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

@@ -3,7 +3,9 @@ export type {
   PackPayload,
   PackExportResult,
   PackImportResult,
-  SqlQuestion
+  SqlCheck,
+  SqlQuestion,
+  StorageStatus
 } from './types'
-export { importPack } from './import'
-export { exportPack } from './export'
+export { importPack, importPackPath } from './import'
+export { exportPack, exportPackPayload } from './export'

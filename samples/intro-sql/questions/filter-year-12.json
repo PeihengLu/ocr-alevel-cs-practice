@@ -1,0 +1,21 @@
+{
+  "id": "filter-year-12",
+  "version": 1,
+  "title": "Year 12 names only",
+  "prompt": "Using the same `students` table, return only the `name` of students in year group 12.\n\nOrder does not matter for the check.",
+  "starterQuery": "SELECT name\nFROM students\nWHERE ",
+  "solutionQuery": "SELECT name FROM students WHERE year_group = 12;",
+  "checks": [
+    {
+      "type": "result_set",
+      "expected": [
+        { "name": "Amina" },
+        { "name": "Cara" },
+        { "name": "Dev" }
+      ]
+    }
+  ],
+  "tags": ["select", "where"],
+  "difficulty": "easy",
+  "schemaRef": "school_roster"
+}

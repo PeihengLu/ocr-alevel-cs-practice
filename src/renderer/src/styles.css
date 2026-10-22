@@ -158,3 +158,166 @@ main {
 .btn:hover {
   filter: brightness(1.05);
 }
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.status-line,
+.flash,
+.todo-note {
+  max-width: 52rem;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 0.95rem;
+}
+
+.flash {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+
+.todo-note {
+  margin-top: 0.85rem;
+  color: var(--muted);
+}
+
+.practice-grid,
+.author-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(200px, 240px) minmax(220px, 280px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.author-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.9fr);
+}
+
+.author-side {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .practice-grid,
+  .author-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  max-height: 28rem;
+  overflow: auto;
+}
+
+.question-item {
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.question-item.active,
+.question-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.q-title {
+  font-weight: 600;
+}
+
+.q-meta,
+.tags {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.prompt {
+  white-space: pre-wrap;
+}
+
+.field-label,
+.form-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.code-input {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.55rem;
+}
+
+.code-input {
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.export-set {
+  border: 1px solid var(--line);
+  margin: 0 0 0.85rem;
+  padding: 0.55rem 0.7rem 0.7rem;
+}
+
+.export-set legend {
+  padding: 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.25rem 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+}

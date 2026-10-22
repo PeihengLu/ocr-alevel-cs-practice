@@ -1,0 +1,21 @@
+{
+  "id": "select-all-students",
+  "version": 1,
+  "title": "List every student",
+  "prompt": "The school keeps a `students` table.\n\nWrite a query that returns every row and every column from `students`.",
+  "starterQuery": "SELECT ",
+  "solutionQuery": "SELECT * FROM students;",
+  "checks": [
+    {
+      "type": "row_count",
+      "expected": 4
+    },
+    {
+      "type": "columns",
+      "expected": ["id", "name", "year_group"]
+    }
+  ],
+  "tags": ["select", "basics"],
+  "difficulty": "easy",
+  "schemaRef": "school_roster"
+}

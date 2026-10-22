@@ -1,25 +1,33 @@
 # PortableLeetcode
 
-Offline, plug-and-play coding practice for an A-level student. Ships toward a self-contained desktop app (macOS + Windows) with **Python 3** and **MySQL** later. **Milestone 1** focuses on classroom SQL demos and student SQL practice — algorithms come after.
+Offline, plug-and-play coding practice for an A-level student. **Milestone 1** focuses on classroom SQL demos and student SQL practice — algorithms come after.
 
-One codebase. **Teacher** vs **Student** are different *build artifacts*, not forks.
+One codebase. **Teacher** vs **Student** are different *build artifacts*, not forks (`EDITION` / `VITE_EDITION` only).
 
 ## Product model
 
 | Concern | Approach |
 | --- | --- |
-| Content updates | **Question packs** (`.plpack`) — teacher exports, student imports (USB / email / shared folder); optional auto-load from `content/` next to the app |
-| Editions | Same source; `EDITION` / `VITE_EDITION` set at dev/build time |
-| Storage (later) | Bundled MySQL for question bank, progress, and exercise schemas |
-| Platforms | macOS and Windows, installer-free folder / `.app` / zip |
+| Content updates | **Question packs** (`.plpack`) — teacher exports, student imports |
+| Editions | Same source; `VITE_EDITION=student\|teacher` at dev/build time |
+| Storage | **MySQL** for question bank / packs / attempts when available; **JSON fallback** under Electron `userData` if MySQL is down |
+| Platforms | macOS and Windows (portable MySQL *binary bundling* is a later slice) |
 
-### Packs (draft)
+### Pack format (`.plpack`)
 
-- `manifest.json` — pack id, version, title, created_at, min_app_version, checksum
-- `questions/` — SQL items (prompt, starter query, expected checks, tags, difficulty)
-- `sql/` — schema + seed data per exercise (or shared datasets)
+A `.plpack` is a zip:
 
-Stub TypeScript types live under `src/pack/`. Import/export and MySQL are **not** implemented in this scaffold.
+```
+manifest.json
+questions/<id>.json
+sql/<schemaRef>.sql
+```
+
+- Stable question `id`s; each question has a monotonic `version` (higher wins on import).
+- `manifest.retiredIds` removes questions from the local bank.
+- Import/export run in the Electron main process (file dialogs + zip).
+
+Sample pack sources: `samples/intro-sql/`. Built artifact: `samples/intro-sql.plpack` (also copied to `content/sample-intro.plpack` by `npm run sample:pack`).
 
 ### Editions
 
@@ -31,63 +39,85 @@ Stub TypeScript types live under `src/pack/`. Import/export and MySQL are **not*
 | Classroom demo UI | Yes | No |
 | Practice + check answers | Yes | Yes |
 
-Teacher-only routes/UI are gated with `isTeacher` from `src/edition.ts` (reads `import.meta.env.VITE_EDITION`).
-
 ## Requirements
 
-- Node.js 20+ (22 recommended)
+- Node.js 20+ (22+ recommended)
 - npm
+- **Optional MySQL 8** for durable app storage (local install or Docker). Without it, pack round-trip still works via the JSON bank.
+
+## MySQL (local / Docker)
+
+Defaults (see `.env.example` and `src/main/db/config.ts`):
+
+| Variable | Default |
+| --- | --- |
+| `MYSQL_HOST` | `127.0.0.1` |
+| `MYSQL_PORT` | `3306` |
+| `MYSQL_USER` | `portable` |
+| `MYSQL_PASSWORD` | `portable` |
+| `MYSQL_DATABASE` | `portable_leetcode` |
+
+Schema migration: `sql/001_app_schema.sql` (applied automatically when MySQL connects).
+
+```bash
+# Option A — Docker
+docker compose up -d
+
+# Option B — any local MySQL 8 with matching user/db (or export MYSQL_* to match)
+
+# Force JSON-only storage (skip MySQL probe)
+export PORTABLE_LEETCODE_STORAGE=json
+```
+
+Bundled portable `mysqld` is **out of scope** for this milestone slice.
 
 ## Run (dev)
 
 ```bash
 npm install
+npm run sample:pack   # refresh samples/intro-sql.plpack
 
-# Student edition (default if unset)
+# Student edition
 npm run dev:student
-# equivalent: EDITION=student / VITE_EDITION=student
 
 # Teacher edition (Author + Demo nav)
 npm run dev:teacher
+
+npm run typecheck
 ```
 
-Scripts set `VITE_EDITION=student|teacher` via `cross-env`. The Vite config also accepts `EDITION` as a fallback.
+### What to try
+
+1. **Student:** Practice → **Import .plpack…** → choose `samples/intro-sql.plpack` → pick a question → edit SQL → **Run query** (stub message until the exercise runner lands).
+2. **Teacher:** Author → save a question → select questions → **Export .plpack…** → re-import in Student to verify merge.
 
 ## Build
 
 ```bash
-npm run build:student   # renderer + electron → out/
+npm run build:student
 npm run build:teacher
+npm run pack:mac   # after build — electron-builder dir target
+npm run pack:win
 ```
-
-### Packaging intent (mac / win)
-
-Self-contained, **no system installer** preferred:
-
-```bash
-# After build:student or build:teacher
-npm run pack:mac   # electron-builder --mac dir  → release/
-npm run pack:win   # electron-builder --win dir  → release/
-```
-
-Up to four packages: teacher/student × macOS/Windows. Bundled portable MySQL is **out of scope** for this scaffold; packaging scripts are placeholders for the packaging phase.
 
 ## Project layout
 
 ```
-src/main/                 # Electron main process
-src/preload/              # Preload bridge
+sql/                      # MySQL app schema migrations
+samples/intro-sql/        # Sample pack source + built .plpack
+src/shared/pack/          # Pack types, validate, merge rules
+src/main/pack/            # Zip encode/decode
+src/main/store/           # Question bank (MySQL + JSON fallback)
+src/main/db/              # MySQL config + migrate
+src/preload/              # IPC bridge
 src/renderer/src/
-  edition.ts              # build-time edition flag (VITE_EDITION)
-  screens/                # Student practice; Teacher author/demo (gated)
-  pack/                   # .plpack types + import/export stubs
+  edition.ts              # VITE_EDITION gate
+  pack/                   # Thin IPC wrappers
+  screens/                # Practice / Author / Demo
 ```
 
-## Milestone 1 (next)
+## Milestone 1 status (this slice)
 
-1. Pack format + MySQL schema for questions/attempts  
-2. Student: import → list → run query → check  
-3. Teacher: author → export; classroom demo UI  
-4. Portable MySQL + OS packaging  
+Done: pack format, import/export, MySQL schema, Student import→list→open, Teacher author→export, sample pack, JSON fallback.
 
-See project docs in the PortableLeetcode coordinator store for locked decisions.
+Next: MySQL exercise runner (pass/fail), classroom demo polish, portable MySQL packaging.
