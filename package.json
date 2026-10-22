@@ -1,0 +1,61 @@
+{
+  "name": "portable-leetcode",
+  "version": "0.1.0",
+  "description": "Offline plug-and-play coding practice — SQL demos and student practice (Teacher/Student editions from one codebase)",
+  "main": "./out/main/index.js",
+  "author": "PeihengLu",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "dev:student": "cross-env VITE_EDITION=student electron-vite dev",
+    "dev:teacher": "cross-env VITE_EDITION=teacher electron-vite dev",
+    "build": "electron-vite build",
+    "build:student": "cross-env VITE_EDITION=student electron-vite build",
+    "build:teacher": "cross-env VITE_EDITION=teacher electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+    "pack:dir": "electron-builder --dir",
+    "pack:mac": "electron-builder --mac dir",
+    "pack:win": "electron-builder --win dir"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^38.2.2",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^4.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.10",
+    "wait-on": "^9.0.1"
+  },
+  "build": {
+    "appId": "com.portableleetcode.app",
+    "productName": "PortableLeetcode",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dir"
+      ],
+      "category": "public.app-category.education"
+    },
+    "win": {
+      "target": [
+        "dir"
+      ]
+    }
+  }
+}
