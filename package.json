@@ -16,6 +16,7 @@
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
     "sample:pack": "node scripts/build-sample-pack.mjs",
+    "test:practice": "node --experimental-strip-types scripts/smoke-practice.mts",
     "pack:dir": "electron-builder --dir",
     "pack:mac": "electron-builder --mac dir",
     "pack:win": "electron-builder --win dir"

@@ -1,0 +1,25 @@
+{
+  "id": "basics-order-by-desc",
+  "version": 1,
+  "title": "6. ORDER BY descending",
+  "prompt": "Sort the other way with `DESC`.\n\nReturn `name` and `maths_score`, ordered by maths score from **highest to lowest**.",
+  "starterQuery": "SELECT name, maths_score\nFROM students\nORDER BY ",
+  "solutionQuery": "SELECT name, maths_score FROM students ORDER BY maths_score DESC;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": true,
+      "expected": [
+        { "name": "Cara", "maths_score": 91 },
+        { "name": "Elena", "maths_score": 88 },
+        { "name": "Amina", "maths_score": 78 },
+        { "name": "Farah", "maths_score": 72 },
+        { "name": "Ben", "maths_score": 64 },
+        { "name": "Dev", "maths_score": 55 }
+      ]
+    }
+  ],
+  "tags": ["order-by", "desc"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

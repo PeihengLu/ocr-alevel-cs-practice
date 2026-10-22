@@ -1,8 +1,8 @@
-# Optional local MySQL for PortableLeetcode app storage.
-# Portable bundled mysqld is a later packaging slice — use this (or any local MySQL) for now.
+# OPTIONAL / secondary local MySQL for developers who prefer containers.
+# On this Mac, Docker Desktop is unreliable — prefer Homebrew MySQL (see README).
+# Shipped student/teacher builds will use a BUNDLED portable mysqld (not Docker, not brew).
 #
-#   docker compose up -d
-#   # then npm run dev:student / dev:teacher
+#   docker compose up -d   # only if Docker works on your machine
 #
 # Connection defaults match src/main/db/config.ts and .env.example.
 
@@ -20,6 +20,7 @@ services:
       MYSQL_PASSWORD: portable
     volumes:
       - portable_leetcode_mysql:/var/lib/mysql
+      - ./sql/000_exercise_db.sql:/docker-entrypoint-initdb.d/000_exercise_db.sql:ro
       - ./sql/001_app_schema.sql:/docker-entrypoint-initdb.d/001_app_schema.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uportable", "-pportable"]

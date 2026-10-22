@@ -39,4 +39,4 @@ coverage/
 !samples/**/*.plpack
 content/*
 !content/.gitkeep
-!content/sample-intro.plpack
+!content/*.plpack

@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "packId": "sql-basics",
+  "version": "1.0.0",
+  "title": "SQL Basics (absolute beginner)",
+  "description": "Progressive A-level-friendly SELECT practice — one concept per question, no JOINs. Dataset: school students.",
+  "createdAt": "2026-10-22T00:00:00.000Z",
+  "minAppVersion": "0.1.0",
+  "questionIds": [
+    "basics-select-all",
+    "basics-select-columns",
+    "basics-where-equals",
+    "basics-where-and-or",
+    "basics-order-by-asc",
+    "basics-order-by-desc",
+    "basics-limit",
+    "basics-count-star",
+    "basics-count-filtered",
+    "basics-distinct"
+  ]
+}

@@ -3,6 +3,7 @@ import type {
   PackExportResult,
   PackImportResult,
   PackPayload,
+  QueryRunResult,
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
@@ -59,17 +60,12 @@ const api = {
     return ipcRenderer.invoke('pack:exportPayload', payload)
   },
 
-  runQuery(
-    questionId: string,
-    sql: string
-  ): Promise<{
-    ok: boolean
-    stub: true
-    message: string
-    questionId: string
-    sql: string
-  }> {
+  runQuery(questionId: string, sql: string): Promise<QueryRunResult> {
     return ipcRenderer.invoke('practice:runQuery', { questionId, sql })
+  },
+
+  runDemo(questionId: string, sql?: string): Promise<QueryRunResult> {
+    return ipcRenderer.invoke('practice:runDemo', { questionId, sql })
   }
 }
 

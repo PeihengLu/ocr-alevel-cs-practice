@@ -42,7 +42,7 @@ export async function initBank(): Promise<StorageStatus> {
     return getStorageStatus()
   }
 
-  const cfg = readMysqlConfig()
+  const cfg = readMysqlConfig(app.getPath('userData'))
   mysqlConfigured = true
 
   try {
@@ -99,6 +99,10 @@ export function getStorageStatus(): StorageStatus {
     message: statusMessage,
     questionCount: Object.keys(bank.questions).length
   }
+}
+
+export function getMysqlConnected(): boolean {
+  return mysqlConnected
 }
 
 export function listQuestions(): SqlQuestion[] {

@@ -32,12 +32,17 @@ export interface PackManifest {
   checksum?: string
 }
 
-/** How a student submission is checked (runner wiring comes later). */
+/** How a student submission is checked. */
 export type SqlCheck =
   | {
       type: 'result_set'
-      /** Rows as objects; column order ignored when comparing. */
+      /** Rows as objects; column *names* matched case-insensitively. */
       expected: Record<string, unknown>[]
+      /**
+       * When true, row order must match (use for ORDER BY exercises).
+       * Default false — multiset compare, order ignored.
+       */
+      ordered?: boolean
     }
   | {
       type: 'row_count'
@@ -45,7 +50,40 @@ export type SqlCheck =
     }
   | {
       type: 'columns'
+      /** Expected column names (order matters). */
       expected: string[]
+    }
+
+export interface QueryResultGrid {
+  columns: string[]
+  rows: Record<string, unknown>[]
+}
+
+export interface CheckOutcome {
+  index: number
+  type: SqlCheck['type']
+  passed: boolean
+  detail: string
+}
+
+export type QueryRunResult =
+  | {
+      ok: true
+      passed: boolean
+      message: string
+      questionId: string
+      sql: string
+      result: QueryResultGrid
+      checks: CheckOutcome[]
+    }
+  | {
+      ok: false
+      passed: false
+      message: string
+      questionId: string
+      sql: string
+      result?: QueryResultGrid
+      checks?: CheckOutcome[]
     }
 
 export interface SqlQuestion {

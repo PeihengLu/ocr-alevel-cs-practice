@@ -1,0 +1,22 @@
+{
+  "id": "basics-where-and-or",
+  "version": 1,
+  "title": "4. WHERE with AND / OR",
+  "prompt": "Combine conditions with `AND` / `OR`.\n\nReturn `name` and `maths_score` for students who are in year **13** **or** have a maths score of at least **90**.\n\n(Order does not matter.)",
+  "starterQuery": "SELECT name, maths_score\nFROM students\nWHERE ",
+  "solutionQuery": "SELECT name, maths_score FROM students WHERE year_group = 13 OR maths_score >= 90;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Ben", "maths_score": 64 },
+        { "name": "Cara", "maths_score": 91 },
+        { "name": "Elena", "maths_score": 88 }
+      ]
+    }
+  ],
+  "tags": ["where", "and", "or"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

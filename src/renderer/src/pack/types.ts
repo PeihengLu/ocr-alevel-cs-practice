@@ -4,10 +4,13 @@
  */
 
 export type {
+  CheckOutcome,
   PackManifest,
   PackPayload,
   PackExportResult,
   PackImportResult,
+  QueryResultGrid,
+  QueryRunResult,
   SqlCheck,
   SqlQuestion,
   StorageStatus

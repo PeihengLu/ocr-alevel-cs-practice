@@ -1,0 +1,19 @@
+{
+  "id": "basics-count-filtered",
+  "version": 1,
+  "title": "9. COUNT with a filter",
+  "prompt": "You can combine `COUNT` with `WHERE`.\n\nHow many students are in the **Red** house? Return one row with that count.\n\nTip: `COUNT(*)` counts rows; filtering happens in `WHERE`.",
+  "starterQuery": "SELECT COUNT(*)\nFROM students\nWHERE ",
+  "solutionQuery": "SELECT COUNT(*) FROM students WHERE house = 'Red';",
+  "checks": [
+    { "type": "row_count", "expected": 1 },
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [{ "COUNT(*)": 2 }]
+    }
+  ],
+  "tags": ["aggregate", "count", "where"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "basics-count-star",
+  "version": 1,
+  "title": "8. COUNT all rows",
+  "prompt": "`COUNT(*)` tells you how many rows match.\n\nReturn a single column (any name is fine — commonly `COUNT(*)`) with the number of students in the table.",
+  "starterQuery": "SELECT COUNT(*)\nFROM ",
+  "solutionQuery": "SELECT COUNT(*) FROM students;",
+  "checks": [
+    { "type": "row_count", "expected": 1 },
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [{ "COUNT(*)": 6 }]
+    }
+  ],
+  "tags": ["aggregate", "count"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

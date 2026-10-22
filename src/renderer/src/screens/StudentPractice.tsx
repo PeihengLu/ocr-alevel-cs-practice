@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactElement } from 'react'
+import { ResultGrid } from '../components/ResultGrid'
 import { importPack } from '../pack'
-import type { SqlQuestion, StorageStatus } from '../pack'
+import type { QueryRunResult, SqlQuestion, StorageStatus } from '../pack'
 
 export function StudentPractice(): ReactElement {
   const [status, setStatus] = useState<StorageStatus | null>(null)
@@ -8,7 +9,7 @@ export function StudentPractice(): ReactElement {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [flash, setFlash] = useState<string | null>(null)
-  const [runNote, setRunNote] = useState<string | null>(null)
+  const [runResult, setRunResult] = useState<QueryRunResult | null>(null)
   const [busy, setBusy] = useState(false)
 
   const selected = questions.find((q) => q.id === selectedId) ?? null
@@ -34,7 +35,7 @@ export function StudentPractice(): ReactElement {
   useEffect(() => {
     if (selected) setQuery(selected.starterQuery)
     else setQuery('')
-    setRunNote(null)
+    setRunResult(null)
   }, [selected])
 
   async function onImport(): Promise<void> {
@@ -60,7 +61,7 @@ export function StudentPractice(): ReactElement {
     setBusy(true)
     try {
       const result = await window.portableLeetcode.runQuery(selected.id, query)
-      setRunNote(result.message)
+      setRunResult(result)
     } finally {
       setBusy(false)
     }
@@ -72,15 +73,18 @@ export function StudentPractice(): ReactElement {
         <p className="eyebrow">Student</p>
         <h1>Practice</h1>
         <p className="lede">
-          Import a <code>.plpack</code>, browse SQL questions, open one, and try
-          a query. Pass/fail against MySQL is stubbed until the exercise runner
-          lands.
+          Import a <code>.plpack</code>, open a question, and run a single{' '}
+          <code>SELECT</code> against the exercise MySQL schema. Results are
+          checked for pass/fail.
         </p>
       </header>
 
       {status && (
         <p className="status-line" role="status">
-          Storage: <strong>{status.backend}</strong> — {status.message}
+          Storage: <strong>{status.backend}</strong>
+          {status.mysqlConnected ? ' · MySQL ready for Run Query' : ' · MySQL offline (Run Query needs Docker/local MySQL)'}
+          {' — '}
+          {status.message}
         </p>
       )}
       {flash && (
@@ -92,7 +96,9 @@ export function StudentPractice(): ReactElement {
       <div className="practice-grid">
         <article className="panel">
           <h2>Packs</h2>
-          <p>Load questions from a teacher-exported pack file.</p>
+          <p>
+            Try <code>samples/sql-basics.plpack</code> for absolute beginners.
+          </p>
           <button type="button" className="btn" disabled={busy} onClick={() => void onImport()}>
             Import .plpack…
           </button>
@@ -101,7 +107,7 @@ export function StudentPractice(): ReactElement {
         <article className="panel question-list-panel">
           <h2>Questions ({questions.length})</h2>
           {questions.length === 0 ? (
-            <p className="muted">No questions yet — import the sample pack to start.</p>
+            <p className="muted">No questions yet — import a pack to start.</p>
           ) : (
             <ul className="question-list">
               {questions.map((q) => (
@@ -134,7 +140,7 @@ export function StudentPractice(): ReactElement {
                 <code>{selected.schemaRef}</code>
               </p>
               <label className="field-label" htmlFor="student-sql">
-                Your query
+                Your query (single SELECT only)
               </label>
               <textarea
                 id="student-sql"
@@ -154,10 +160,35 @@ export function StudentPractice(): ReactElement {
                   Run query
                 </button>
               </div>
-              {runNote && (
-                <p className="todo-note" role="status">
-                  {runNote}
-                </p>
+
+              {runResult && (
+                <div className="run-outcome">
+                  <p
+                    className={
+                      runResult.ok && runResult.passed
+                        ? 'pass-banner'
+                        : 'fail-banner'
+                    }
+                    role="status"
+                  >
+                    {runResult.message}
+                  </p>
+                  {runResult.checks && runResult.checks.length > 0 && (
+                    <ul className="check-list">
+                      {runResult.checks.map((c) => (
+                        <li key={c.index} className={c.passed ? 'check-pass' : 'check-fail'}>
+                          {c.passed ? '✓' : '✗'} {c.detail}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {runResult.result && (
+                    <>
+                      <h3 className="result-heading">Result</h3>
+                      <ResultGrid result={runResult.result} />
+                    </>
+                  )}
+                </div>
               )}
             </>
           ) : (

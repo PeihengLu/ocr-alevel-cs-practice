@@ -1,0 +1,25 @@
+{
+  "id": "basics-order-by-asc",
+  "version": 1,
+  "title": "5. ORDER BY ascending",
+  "prompt": "`ORDER BY` sorts the result.\n\nReturn every student's `name`, sorted **A → Z** (ascending).",
+  "starterQuery": "SELECT name\nFROM students\nORDER BY ",
+  "solutionQuery": "SELECT name FROM students ORDER BY name ASC;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": true,
+      "expected": [
+        { "name": "Amina" },
+        { "name": "Ben" },
+        { "name": "Cara" },
+        { "name": "Dev" },
+        { "name": "Elena" },
+        { "name": "Farah" }
+      ]
+    }
+  ],
+  "tags": ["order-by", "asc"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

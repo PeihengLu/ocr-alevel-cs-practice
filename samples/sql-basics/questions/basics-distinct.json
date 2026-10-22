@@ -1,0 +1,22 @@
+{
+  "id": "basics-distinct",
+  "version": 1,
+  "title": "10. DISTINCT values",
+  "prompt": "`DISTINCT` removes duplicate values from the result.\n\nReturn each unique `house` name once (order does not matter).",
+  "starterQuery": "SELECT DISTINCT house\nFROM ",
+  "solutionQuery": "SELECT DISTINCT house FROM students;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "house": "Red" },
+        { "house": "Blue" },
+        { "house": "Green" }
+      ]
+    }
+  ],
+  "tags": ["distinct"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

@@ -13,6 +13,7 @@ interface ImportMeta {
 interface SqlCheckResultSet {
   type: 'result_set'
   expected: Record<string, unknown>[]
+  ordered?: boolean
 }
 
 interface SqlCheckRowCount {
@@ -82,6 +83,38 @@ interface StorageStatus {
   questionCount: number
 }
 
+interface QueryResultGrid {
+  columns: string[]
+  rows: Record<string, unknown>[]
+}
+
+interface CheckOutcome {
+  index: number
+  type: SqlCheck['type']
+  passed: boolean
+  detail: string
+}
+
+type QueryRunResult =
+  | {
+      ok: true
+      passed: boolean
+      message: string
+      questionId: string
+      sql: string
+      result: QueryResultGrid
+      checks: CheckOutcome[]
+    }
+  | {
+      ok: false
+      passed: false
+      message: string
+      questionId: string
+      sql: string
+      result?: QueryResultGrid
+      checks?: CheckOutcome[]
+    }
+
 interface PortableLeetcodeBridge {
   platform: NodeJS.Platform
   editions: readonly Edition[]
@@ -106,16 +139,8 @@ interface PortableLeetcodeBridge {
     questionIds: string[]
   }): Promise<PackExportResult>
   exportPackPayload(payload: PackPayload): Promise<PackExportResult>
-  runQuery(
-    questionId: string,
-    sql: string
-  ): Promise<{
-    ok: boolean
-    stub: true
-    message: string
-    questionId: string
-    sql: string
-  }>
+  runQuery(questionId: string, sql: string): Promise<QueryRunResult>
+  runDemo(questionId: string, sql?: string): Promise<QueryRunResult>
 }
 
 interface Window {

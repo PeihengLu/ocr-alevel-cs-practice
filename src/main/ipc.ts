@@ -4,10 +4,12 @@ import type {
   PackExportResult,
   PackImportResult,
   PackPayload,
+  QueryRunResult,
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
 import { packPlpack, unpackPlpack } from './pack/zip'
+import { runDemoQuery, runStudentQuery } from './practice/runner'
 import {
   buildPackFromQuestionIds,
   getQuestion,
@@ -149,40 +151,53 @@ export function registerIpcHandlers(): void {
     }
   )
 
-  /**
-   * TODO(M1): run student SQL against an isolated exercise schema and evaluate checks.
-   * Stubbed until MySQL exercise runner lands; still records the intent in UI.
-   */
   ipcMain.handle(
     'practice:runQuery',
     async (
       _e,
       args: { questionId: string; sql: string }
-    ): Promise<{
-      ok: boolean
-      stub: true
-      message: string
-      questionId: string
-      sql: string
-    }> => {
+    ): Promise<QueryRunResult> => {
       const q = getQuestion(args.questionId)
       if (!q) {
         return {
           ok: false,
-          stub: true,
+          passed: false,
           message: `Unknown question "${args.questionId}"`,
           questionId: args.questionId,
           sql: args.sql
         }
       }
-      return {
-        ok: true,
-        stub: true,
-        message:
-          'TODO: execute against MySQL exercise schema and evaluate checks. Pack + bank are wired; query runner is next.',
-        questionId: args.questionId,
-        sql: args.sql
+      return runStudentQuery(q, args.sql)
+    }
+  )
+
+  ipcMain.handle(
+    'practice:runDemo',
+    async (
+      _e,
+      args: { questionId: string; sql?: string }
+    ): Promise<QueryRunResult> => {
+      const q = getQuestion(args.questionId)
+      if (!q) {
+        return {
+          ok: false,
+          passed: false,
+          message: `Unknown question "${args.questionId}"`,
+          questionId: args.questionId,
+          sql: args.sql ?? ''
+        }
       }
+      const sql = (args.sql ?? q.solutionQuery ?? q.starterQuery).trim()
+      if (!sql) {
+        return {
+          ok: false,
+          passed: false,
+          message: 'No solution or starter query available for this question.',
+          questionId: args.questionId,
+          sql: ''
+        }
+      }
+      return runDemoQuery(q, sql)
     }
   )
 }

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
+import { ensureMysqlSidecar, stopMysqlSidecar } from './db/portableMysql'
 import { registerIpcHandlers } from './ipc'
 import { initBank } from './store/bank'
 
@@ -37,6 +38,11 @@ function createWindow(): void {
 
 app.whenReady().then(async () => {
   registerIpcHandlers()
+
+  // Architecture hook: packaged builds will start a bundled mysqld here.
+  // Dev typically connects to an already-running local MySQL (e.g. Homebrew).
+  await ensureMysqlSidecar()
+
   const status = await initBank()
   console.info('[portable-leetcode] storage:', status)
 
@@ -45,6 +51,10 @@ app.whenReady().then(async () => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+app.on('before-quit', () => {
+  void stopMysqlSidecar()
 })
 
 app.on('window-all-closed', () => {

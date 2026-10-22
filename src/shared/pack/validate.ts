@@ -141,9 +141,14 @@ function validateCheck(raw: unknown, qi: number, ci: number): SqlCheck {
     if (!Array.isArray(raw.expected)) {
       throw new Error(`questions[${qi}].checks[${ci}].expected must be an array`)
     }
+    const ordered = raw.ordered
+    if (ordered !== undefined && typeof ordered !== 'boolean') {
+      throw new Error(`questions[${qi}].checks[${ci}].ordered must be a boolean`)
+    }
     return {
       type: 'result_set',
-      expected: raw.expected as Record<string, unknown>[]
+      expected: raw.expected as Record<string, unknown>[],
+      ordered
     }
   }
 
