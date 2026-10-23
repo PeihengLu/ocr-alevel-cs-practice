@@ -65,12 +65,22 @@ See also `release/HOW-TO-OPEN.md`.
 ```bash
 npm run pack:mac:teacher   # → release/teacher-mac/…
 npm run pack:mac:student   # → release/student-mac/…
-npm run pack:win           # stub note — build Win on a Windows host
+npm run dist:student:win   # → release/student-win/ (MariaDB winx64 bundled)
 ```
 
-### Windows
+### Windows Student
 
-Stubbed on this Mac (`npm run pack:win` prints steps). Needs a Windows-staged `vendor/mysql` + `electron-builder --win dir`.
+```bash
+npm run vendor:mysql:win   # official MariaDB winx64 → vendor/mysql-win
+npm run dist:student:win   # portable .exe + win-unpacked/
+```
+
+Artifacts (no Docker/Homebrew on the student PC):
+
+- `release/student-win/PortableLeetcode Student-0.1.0-portable.exe`
+- `release/student-win/win-unpacked/PortableLeetcode Student.exe`
+
+See `PACKAGING.md`.
 
 ## Dev MySQL on this Mac (Homebrew — not for students)
 
@@ -140,8 +150,9 @@ npm run test:practice
 ```bash
 npm run build:student
 npm run build:teacher
-npm run pack:mac   # electron-builder dir — portable folder (mysqld bundling later)
-npm run pack:win
+npm run pack:mac:teacher   # Mac Teacher .app + bundled mysqld
+npm run pack:mac:student   # Mac Student .app
+npm run dist:student:win   # Windows Student portable + MariaDB winx64
 ```
 
 ## Project layout

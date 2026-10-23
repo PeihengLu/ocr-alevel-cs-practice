@@ -41,8 +41,10 @@ content/*
 !content/.gitkeep
 !content/*.plpack
 
-# Staged portable MySQL (regenerate with npm run vendor:mysql)
+# Staged portable MySQL/MariaDB (regenerate with npm run vendor:mysql / vendor:mysql:win)
 vendor/mysql/
+vendor/mysql-win/
+vendor/.cache/
 
 # Local mysqld datadir (dev experiments)
 .mysql-data/

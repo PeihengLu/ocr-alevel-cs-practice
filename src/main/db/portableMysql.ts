@@ -9,6 +9,7 @@ import type { MysqlConfig } from './config'
 import { readMysqlConfig } from './config'
 
 const execFileAsync = promisify(execFile)
+const isWin = process.platform === 'win32'
 
 export interface PortableMysqlHandle {
   owned: boolean
@@ -22,9 +23,9 @@ let child: ChildProcess | null = null
 let stopping = false
 
 /**
- * Ensure a MySQL server is available.
+ * Ensure a MySQL/MariaDB server is available.
  * Packaged builds: start bundled mysqld (resources/mysql) if present.
- * Dev: connect to existing local MySQL unless a vendor/mysql tree + preferBundled.
+ * Dev: connect to existing local MySQL unless a vendor tree + preferBundled.
  */
 export async function ensureMysqlSidecar(): Promise<PortableMysqlHandle> {
   const config = readMysqlConfig(app.getPath('userData'))
@@ -48,49 +49,75 @@ export async function ensureMysqlSidecar(): Promise<PortableMysqlHandle> {
   }
 
   await mkdir(config.dataDir, { recursive: true })
-  const socketPath = socketFor(config)
+  const socketPath = isWin ? null : socketFor(config)
   const pidPath = join(config.dataDir, 'mysqld.pid')
   const errorLog = join(config.dataDir, 'mysqld.err')
+  const lcMessagesDir = resolveLcMessagesDir(resolved.baseDir)
 
   const needsInit = !existsSync(join(config.dataDir, 'mysql'))
   if (needsInit) {
     console.info('[portable-leetcode] initializing bundled MySQL datadir at', config.dataDir)
-    await execFileAsync(
-      resolved.mysqld,
-      [
-        '--initialize-insecure',
-        `--basedir=${resolved.baseDir}`,
-        `--datadir=${config.dataDir}`,
-        `--lc-messages-dir=${join(resolved.baseDir, 'share', 'mysql')}`
-      ],
-      { env: process.env }
-    )
+    const initArgs = [
+      '--initialize-insecure',
+      `--basedir=${resolved.baseDir}`,
+      `--datadir=${config.dataDir}`
+    ]
+    if (lcMessagesDir) {
+      initArgs.push(`--lc-messages-dir=${lcMessagesDir}`)
+    }
+    try {
+      await execFileAsync(resolved.mysqld, initArgs, { env: process.env })
+    } catch (err) {
+      // MariaDB Windows zips ship mysql_install_db.exe as a fallback.
+      const installDb = join(
+        resolved.baseDir,
+        'bin',
+        isWin ? 'mysql_install_db.exe' : 'mysql_install_db'
+      )
+      if (!existsSync(installDb)) throw err
+      console.warn(
+        '[portable-leetcode] --initialize-insecure failed; trying mysql_install_db',
+        err instanceof Error ? err.message : err
+      )
+      await execFileAsync(
+        installDb,
+        [`--datadir=${config.dataDir}`, `--basedir=${resolved.baseDir}`],
+        { env: process.env }
+      )
+    }
   }
 
   console.info(
     `[portable-leetcode] starting bundled mysqld on ${config.host}:${config.port}`
   )
 
-  const proc = spawn(
-    resolved.mysqld,
-    [
-      `--basedir=${resolved.baseDir}`,
-      `--datadir=${config.dataDir}`,
-      `--port=${config.port}`,
-      `--socket=${socketPath}`,
-      `--pid-file=${pidPath}`,
-      `--lc-messages-dir=${join(resolved.baseDir, 'share', 'mysql')}`,
-      '--bind-address=127.0.0.1',
-      '--mysqlx=0',
-      '--skip-grant-tables=0',
-      `--log-error=${errorLog}`
-    ],
-    {
-      env: process.env,
-      detached: false,
-      stdio: ['ignore', 'pipe', 'pipe']
-    }
-  )
+  const runArgs = [
+    `--basedir=${resolved.baseDir}`,
+    `--datadir=${config.dataDir}`,
+    `--port=${config.port}`,
+    `--pid-file=${pidPath}`,
+    '--bind-address=127.0.0.1',
+    '--mysqlx=0',
+    '--skip-grant-tables=0',
+    `--log-error=${errorLog}`
+  ]
+  if (lcMessagesDir) {
+    runArgs.push(`--lc-messages-dir=${lcMessagesDir}`)
+  }
+  if (socketPath) {
+    runArgs.push(`--socket=${socketPath}`)
+  } else if (isWin) {
+    // Named pipe optional; force TCP so students don't need pipe config.
+    runArgs.push('--skip-networking=0', '--enable-named-pipe=0')
+  }
+
+  const proc = spawn(resolved.mysqld, runArgs, {
+    env: process.env,
+    detached: false,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    // On Windows, DLLs (server.dll) must resolve next to mysqld.exe.
+    cwd: join(resolved.baseDir, 'bin')
+  })
   child = proc
 
   proc.stdout?.on('data', (buf: Buffer) => {
@@ -134,29 +161,32 @@ export async function stopMysqlSidecar(): Promise<void> {
       return
     }
 
-    const mysqladmin = join(handle.baseDir, 'bin', 'mysqladmin')
-    const socketPath = socketFor(handle.config)
+    const mysqladmin = join(
+      handle.baseDir,
+      'bin',
+      isWin ? 'mysqladmin.exe' : 'mysqladmin'
+    )
+    const socketPath = isWin ? null : socketFor(handle.config)
     console.info('[portable-leetcode] stopping bundled mysqld…')
     try {
       if (existsSync(mysqladmin)) {
-        await execFileAsync(
-          mysqladmin,
-          [
-            '-u',
-            'root',
-            `--socket=${socketPath}`,
-            `--port=${handle.config.port}`,
-            'shutdown'
-          ],
-          { timeout: 15000 }
-        )
+        const args = ['-u', 'root', `--port=${handle.config.port}`, 'shutdown']
+        if (socketPath) args.splice(2, 0, `--socket=${socketPath}`)
+        else {
+          args.splice(2, 0, `-h`, handle.config.host)
+        }
+        await execFileAsync(mysqladmin, args, { timeout: 15000 })
       }
     } catch (err) {
       console.warn(
         '[portable-leetcode] mysqladmin shutdown failed, killing process',
         err instanceof Error ? err.message : err
       )
-      child?.kill('SIGTERM')
+      if (isWin) {
+        child?.kill()
+      } else {
+        child?.kill('SIGTERM')
+      }
     }
 
     const deadline = Date.now() + 10000
@@ -164,7 +194,8 @@ export async function stopMysqlSidecar(): Promise<void> {
       await sleep(200)
     }
     if (child) {
-      child.kill('SIGKILL')
+      if (isWin) child.kill()
+      else child.kill('SIGKILL')
     }
   } finally {
     child = null
@@ -183,17 +214,35 @@ function resolveBundledMysql(): { mysqld: string; baseDir: string } | null {
   if (app.isPackaged) {
     candidates.push(join(process.resourcesPath, 'mysql'))
   }
-  candidates.push(join(process.cwd(), 'vendor', 'mysql'))
+
+  // Platform-specific vendor trees (mac vs win must never mix).
+  if (isWin) {
+    candidates.push(join(process.cwd(), 'vendor', 'mysql-win'))
+  } else {
+    candidates.push(join(process.cwd(), 'vendor', 'mysql'))
+    // Allow local smoke of win tree layout only when intentionally present on non-win (no).
+  }
 
   for (const baseDir of candidates) {
-    const mysqld = join(
-      baseDir,
-      'bin',
-      process.platform === 'win32' ? 'mysqld.exe' : 'mysqld'
-    )
+    const mysqld = join(baseDir, 'bin', isWin ? 'mysqld.exe' : 'mysqld')
     if (existsSync(mysqld)) {
       return { mysqld, baseDir }
     }
+  }
+  return null
+}
+
+/** MySQL Homebrew stage uses share/mysql; MariaDB winx64 uses share/english. */
+function resolveLcMessagesDir(baseDir: string): string | null {
+  if (existsSync(join(baseDir, 'share', 'mysql'))) {
+    return join(baseDir, 'share', 'mysql')
+  }
+  // MariaDB: errmsg.sys lives under share/<language>/; lc-messages-dir is share.
+  if (existsSync(join(baseDir, 'share', 'english', 'errmsg.sys'))) {
+    return join(baseDir, 'share')
+  }
+  if (existsSync(join(baseDir, 'share'))) {
+    return join(baseDir, 'share')
   }
   return null
 }
@@ -204,7 +253,7 @@ function socketFor(config: MysqlConfig): string {
 
 async function waitForMysql(
   config: MysqlConfig,
-  socketPath: string,
+  socketPath: string | null,
   timeoutMs: number
 ): Promise<void> {
   const start = Date.now()
@@ -216,7 +265,8 @@ async function waitForMysql(
         port: config.port,
         user: 'root',
         password: '',
-        socketPath: existsSync(socketPath) ? socketPath : undefined,
+        socketPath:
+          socketPath && existsSync(socketPath) ? socketPath : undefined,
         connectTimeout: 2000
       })
       await conn.query('SELECT 1')
@@ -233,7 +283,7 @@ async function waitForMysql(
 }
 
 async function bootstrapAppDatabases(config: MysqlConfig): Promise<void> {
-  const socketPath = socketFor(config)
+  const socketPath = isWin ? null : socketFor(config)
   const user = sqlIdent(config.user)
   const pass = sqlString(config.password)
   const db = sqlIdent(config.database)
@@ -243,7 +293,7 @@ async function bootstrapAppDatabases(config: MysqlConfig): Promise<void> {
     port: config.port,
     user: 'root',
     password: '',
-    socketPath: existsSync(socketPath) ? socketPath : undefined,
+    socketPath: socketPath && existsSync(socketPath) ? socketPath : undefined,
     multipleStatements: true
   })
   try {

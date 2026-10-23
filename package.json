@@ -18,10 +18,13 @@
     "sample:pack": "node scripts/build-sample-pack.mjs",
     "test:practice": "node --experimental-strip-types scripts/smoke-practice.mts",
     "vendor:mysql": "node scripts/stage-mysql-mac.mjs",
+    "vendor:mysql:win": "node scripts/stage-mysql-win.mjs",
     "pack:mac:teacher": "npm run vendor:mysql && npm run sample:pack && npm run build:teacher && electron-builder --mac dir --config.productName=\"PortableLeetcode Teacher\" --config.appId=com.portableleetcode.teacher --config.directories.output=release/teacher-mac",
     "pack:mac:student": "npm run vendor:mysql && npm run sample:pack && npm run build:student && electron-builder --mac dir --config.productName=\"PortableLeetcode Student\" --config.appId=com.portableleetcode.student --config.directories.output=release/student-mac",
     "pack:mac": "npm run pack:mac:teacher",
-    "pack:win": "node scripts/pack-win-stub.mjs",
+    "pack:win:student": "npm run vendor:mysql:win && npm run sample:pack && npm run build:student && electron-builder --win dir portable --x64 --config.productName=\"PortableLeetcode Student\" --config.appId=com.portableleetcode.student --config.directories.output=release/student-win",
+    "dist:student:win": "npm run pack:win:student",
+    "pack:win": "npm run pack:win:student",
     "pack:dir": "electron-builder --dir"
   },
   "dependencies": {
@@ -56,13 +59,6 @@
     ],
     "extraResources": [
       {
-        "from": "vendor/mysql",
-        "to": "mysql",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
         "from": "sql",
         "to": "sql",
         "filter": [
@@ -92,11 +88,31 @@
       "category": "public.app-category.education",
       "identity": null,
       "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "extraResources": [
+        {
+          "from": "vendor/mysql",
+          "to": "mysql",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ]
     },
     "win": {
       "target": [
-        "dir"
+        "dir",
+        "portable"
+      ],
+      "artifactName": "${productName}-${version}-portable.${ext}",
+      "extraResources": [
+        {
+          "from": "vendor/mysql-win",
+          "to": "mysql",
+          "filter": [
+            "**/*"
+          ]
+        }
       ]
     }
   }

@@ -1,5 +1,7 @@
 # Vendor binaries (packaging)
 
+Platform trees must not be mixed. Mac apps ship `vendor/mysql`; Windows Student ships `vendor/mysql-win`.
+
 ## macOS
 
 Regenerate a relocatable MySQL tree from Homebrew (dev machine only):
@@ -9,20 +11,24 @@ brew install mysql          # once
 npm run vendor:mysql       # → vendor/mysql/ (gitignored)
 ```
 
-Packaged apps copy this into `Contents/Resources/mysql` via electron-builder `extraResources`.
+Packaged `.app` copies this into `Contents/Resources/mysql` via electron-builder `mac.extraResources`.
 
-## Windows
+## Windows (Student)
 
-Not staged on this Mac. On a Windows build host, place:
+Download official MariaDB **winx64** zip and stage a slim portable tree (includes `mysqld.exe` + `server.dll`):
 
-```
-vendor/mysql/bin/mysqld.exe
-vendor/mysql/bin/mysql.exe
-vendor/mysql/bin/mysqladmin.exe
-vendor/mysql/share/...
-vendor/mysql/lib/...       # required DLLs
+```bash
+npm run vendor:mysql:win   # → vendor/mysql-win/ (gitignored)
 ```
 
-Then `npm run build:teacher && npx electron-builder --win dir`.
+Cache: `vendor/.cache/mariadb-*-winx64.zip`.
 
-See README → Packaging / portable ship.
+Then:
+
+```bash
+npm run dist:student:win   # → release/student-win/
+```
+
+Cross-build from macOS produces `win-unpacked/` (and a portable `.exe` when Wine is available). On a Windows machine the same script produces a double-click portable `.exe`.
+
+See `PACKAGING.md`.
