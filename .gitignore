@@ -36,5 +36,16 @@ coverage/
 
 # Pack artifacts (local imports during dev)
 *.plpack
-content/
+!samples/**/*.plpack
+content/*
 !content/.gitkeep
+!content/*.plpack
+
+# Staged portable MySQL/MariaDB (regenerate with npm run vendor:mysql / vendor:mysql:win)
+vendor/mysql/
+vendor/mysql-win/
+vendor/.cache/
+
+# Local mysqld datadir (dev experiments)
+.mysql-data/
+mysql-data/

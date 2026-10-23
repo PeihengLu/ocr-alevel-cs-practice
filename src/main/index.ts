@@ -1,7 +1,11 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
+import { ensureMysqlSidecar, stopMysqlSidecar } from './db/portableMysql'
+import { registerIpcHandlers } from './ipc'
+import { initBank } from './store/bank'
 
 const isDev = !app.isPackaged
+let quitting = false
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -33,12 +37,36 @@ function createWindow(): void {
   }
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  registerIpcHandlers()
+
+  try {
+    await ensureMysqlSidecar()
+  } catch (err) {
+    console.error('[portable-leetcode] MySQL sidecar failed:', err)
+  }
+
+  const status = await initBank()
+  console.info('[portable-leetcode] storage:', status)
+
   createWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+})
+
+app.on('before-quit', (event) => {
+  if (quitting) return
+  event.preventDefault()
+  quitting = true
+  void stopMysqlSidecar()
+    .catch((err) => {
+      console.error('[portable-leetcode] error stopping mysqld:', err)
+    })
+    .finally(() => {
+      app.exit(0)
+    })
 })
 
 app.on('window-all-closed', () => {

@@ -1,0 +1,22 @@
+{
+  "id": "basics-limit",
+  "version": 1,
+  "title": "7. LIMIT the rows",
+  "prompt": "`LIMIT` keeps only the first N rows after sorting.\n\nReturn the **top 3** student names by maths score (highest first).",
+  "starterQuery": "SELECT name\nFROM students\nORDER BY maths_score DESC\nLIMIT ",
+  "solutionQuery": "SELECT name FROM students ORDER BY maths_score DESC LIMIT 3;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": true,
+      "expected": [
+        { "name": "Cara" },
+        { "name": "Elena" },
+        { "name": "Amina" }
+      ]
+    }
+  ],
+  "tags": ["limit", "order-by"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

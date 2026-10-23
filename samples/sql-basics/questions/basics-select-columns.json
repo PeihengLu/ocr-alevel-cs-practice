@@ -1,0 +1,25 @@
+{
+  "id": "basics-select-columns",
+  "version": 1,
+  "title": "2. Select specific columns",
+  "prompt": "Often you only need some columns.\n\nReturn just `name` and `house` for every student (any row order is fine).",
+  "starterQuery": "SELECT name, house\nFROM ",
+  "solutionQuery": "SELECT name, house FROM students;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina", "house": "Red" },
+        { "name": "Ben", "house": "Blue" },
+        { "name": "Cara", "house": "Green" },
+        { "name": "Dev", "house": "Red" },
+        { "name": "Elena", "house": "Blue" },
+        { "name": "Farah", "house": "Green" }
+      ]
+    }
+  ],
+  "tags": ["select", "columns"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

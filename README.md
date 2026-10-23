@@ -1,93 +1,168 @@
 # PortableLeetcode
 
-Offline, plug-and-play coding practice for an A-level student. Ships toward a self-contained desktop app (macOS + Windows) with **Python 3** and **MySQL** later. **Milestone 1** focuses on classroom SQL demos and student SQL practice — algorithms come after.
+Offline, plug-and-play coding practice for an A-level student. **Milestone 1** focuses on classroom SQL demos and student SQL practice — algorithms come after.
 
-One codebase. **Teacher** vs **Student** are different *build artifacts*, not forks.
+One codebase. **Teacher** vs **Student** are different *build artifacts*, not forks (`EDITION` / `VITE_EDITION` only).
 
 ## Product model
 
 | Concern | Approach |
 | --- | --- |
-| Content updates | **Question packs** (`.plpack`) — teacher exports, student imports (USB / email / shared folder); optional auto-load from `content/` next to the app |
-| Editions | Same source; `EDITION` / `VITE_EDITION` set at dev/build time |
-| Storage (later) | Bundled MySQL for question bank, progress, and exercise schemas |
-| Platforms | macOS and Windows, installer-free folder / `.app` / zip |
+| Content updates | **Question packs** (`.plpack`) — teacher exports, student imports |
+| Editions | Same source; `VITE_EDITION=student\|teacher` at dev/build time |
+| Storage / practice | MySQL for bank + exercise sandbox; JSON bank fallback if MySQL is down |
+| **Shipped apps** | **Portable folder / `.app` / zip — no installer, no Docker, no Homebrew, no system MySQL** |
+| Platforms | macOS and Windows |
 
-### Packs (draft)
+### Pack format (`.plpack`)
 
-- `manifest.json` — pack id, version, title, created_at, min_app_version, checksum
-- `questions/` — SQL items (prompt, starter query, expected checks, tags, difficulty)
-- `sql/` — schema + seed data per exercise (or shared datasets)
+A `.plpack` is a zip:
 
-Stub TypeScript types live under `src/pack/`. Import/export and MySQL are **not** implemented in this scaffold.
+```
+manifest.json
+questions/<id>.json
+sql/<schemaRef>.sql
+```
 
-### Editions
+- Stable question `id`s; higher `version` wins on import; `retiredIds` remove from bank.
+- `result_set` checks support `ordered: true` (ORDER BY) or unordered compare (default).
 
-| | Teacher build | Student build |
+| Pack | Path | Audience |
 | --- | --- | --- |
-| Create/edit questions | Yes | No |
-| Export packs | Yes | No |
-| Import packs | Yes (testing) | Yes |
-| Classroom demo UI | Yes | No |
-| Practice + check answers | Yes | Yes |
+| SQL Basics | `samples/sql-basics.plpack` | Absolute beginners (progressive, no JOINs) |
+| Intro SQL | `samples/intro-sql.plpack` | Tiny 2-question starter |
 
-Teacher-only routes/UI are gated with `isTeacher` from `src/edition.ts` (reads `import.meta.env.VITE_EDITION`).
+Rebuild: `npm run sample:pack`.
 
-## Requirements
+## Packaging / portable ship
 
-- Node.js 20+ (22 recommended)
-- npm
+**Students and classroom machines must not install anything.** Shipped builds are self-contained `.app` bundles (no installer, no Docker, no Homebrew).
+
+### Double-click (macOS arm64, built on this Mac)
+
+| Edition | Path |
+| --- | --- |
+| **Teacher** | `release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app` |
+| **Student** | `release/student-mac/mac-arm64/PortableLeetcode Student.app` |
+
+Full Teacher path:
+
+`/Users/peiheng/development/portable-leetcode/release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app`
+
+**Gatekeeper:** apps are unsigned. First open → right-click `.app` → **Open** → **Open**. Or `xattr -cr "…/PortableLeetcode Teacher.app"`.
+
+See also `release/HOW-TO-OPEN.md`.
+
+### What the packaged app does
+
+1. Bundles portable MySQL under `Contents/Resources/mysql` (staged via `npm run vendor:mysql` from Homebrew on the *build* Mac only).
+2. On launch, `ensureMysqlSidecar()` starts `mysqld` on **`127.0.0.1:13306`** with `--datadir` in `~/Library/Application Support/portable-leetcode/mysql-data`.
+3. On quit, `stopMysqlSidecar()` shuts it down.
+4. Sample packs ship in `Contents/Resources/samples/*.plpack`.
+
+### Rebuild packs (dev machine with Homebrew MySQL)
+
+```bash
+npm run pack:mac:teacher   # → release/teacher-mac/…
+npm run pack:mac:student   # → release/student-mac/…
+npm run dist:student:win   # → release/student-win/ (MariaDB winx64 bundled)
+```
+
+### Windows Student
+
+```bash
+npm run vendor:mysql:win   # official MariaDB winx64 → vendor/mysql-win
+npm run dist:student:win   # portable .exe + win-unpacked/
+```
+
+Artifacts (no Docker/Homebrew on the student PC):
+
+- `release/student-win/PortableLeetcode Student-0.1.0-portable.exe`
+- `release/student-win/win-unpacked/PortableLeetcode Student.exe`
+
+See `PACKAGING.md`.
+
+## Dev MySQL on this Mac (Homebrew — not for students)
+
+Docker Desktop is broken here; use Homebrew for **development only**:
+
+```bash
+brew install mysql          # or: brew install mariadb
+brew services start mysql   # or: brew services start mariadb
+
+# Create app DB + user + exercise sandbox (once)
+chmod +x scripts/setup-local-mysql.sh
+./scripts/setup-local-mysql.sh
+
+# If root needs a password:
+# MYSQL_ROOT_PASSWORD='…' ./scripts/setup-local-mysql.sh
+```
+
+Defaults (`.env.example` / `src/main/db/config.ts`):
+
+| Variable | Default |
+| --- | --- |
+| `MYSQL_HOST` | `127.0.0.1` |
+| `MYSQL_PORT` | `3306` (dev) / **`13306`** (packaged / `MYSQL_PREFER_BUNDLED`) |
+| `MYSQL_USER` | `portable` |
+| `MYSQL_PASSWORD` | `portable` |
+| `MYSQL_DATABASE` | `portable_leetcode` |
+| `MYSQL_DATA_DIR` | `<userData>/mysql-data` |
+
+Exercise sandbox DB: `pl_exercise` (created by the setup script / `sql/000_exercise_db.sql`).
+
+**Optional / secondary:** `docker-compose.yml` exists for developers who have working Docker — not the recommended path on this Mac, and never a student dependency.
+
+```bash
+# Force JSON-only bank (Run Query will error clearly without MySQL)
+export PORTABLE_LEETCODE_STORAGE=json
+```
+
+### Run Query safety
+
+- Single `SELECT` / `WITH … SELECT` only (multi-statement + DDL/DML rejected)
+- Seed applied into isolated `pl_exercise`; student query uses `multipleStatements: false` + read-only transaction
 
 ## Run (dev)
 
 ```bash
 npm install
+npm run sample:pack
+./scripts/setup-local-mysql.sh   # once, after brew MySQL is running
 
-# Student edition (default if unset)
-npm run dev:student
-# equivalent: EDITION=student / VITE_EDITION=student
+npm run dev:student   # Import samples/sql-basics.plpack → Run query
+npm run dev:teacher   # Author / Demo → Load solution → Run for class
 
-# Teacher edition (Author + Demo nav)
-npm run dev:teacher
+npm run typecheck
+npm run test:practice
 ```
 
-Scripts set `VITE_EDITION=student|teacher` via `cross-env`. The Vite config also accepts `EDITION` as a fallback.
+### What to try — Run Query
+
+1. `brew services start mysql` + `./scripts/setup-local-mysql.sh`
+2. `npm run dev:student`
+3. Practice → **Import .plpack…** → `samples/sql-basics.plpack`
+4. Open **1. Select every column**, finish the query, **Run query**
+5. Confirm pass/fail + result grid
 
 ## Build
 
 ```bash
-npm run build:student   # renderer + electron → out/
+npm run build:student
 npm run build:teacher
+npm run pack:mac:teacher   # Mac Teacher .app + bundled mysqld
+npm run pack:mac:student   # Mac Student .app
+npm run dist:student:win   # Windows Student portable + MariaDB winx64
 ```
-
-### Packaging intent (mac / win)
-
-Self-contained, **no system installer** preferred:
-
-```bash
-# After build:student or build:teacher
-npm run pack:mac   # electron-builder --mac dir  → release/
-npm run pack:win   # electron-builder --win dir  → release/
-```
-
-Up to four packages: teacher/student × macOS/Windows. Bundled portable MySQL is **out of scope** for this scaffold; packaging scripts are placeholders for the packaging phase.
 
 ## Project layout
 
 ```
-src/main/                 # Electron main process
-src/preload/              # Preload bridge
-src/renderer/src/
-  edition.ts              # build-time edition flag (VITE_EDITION)
-  screens/                # Student practice; Teacher author/demo (gated)
-  pack/                   # .plpack types + import/export stubs
+sql/                      # App schema + exercise DB grants
+samples/sql-basics/       # Beginner pack
+src/main/db/              # Config + portable mysqld lifecycle hooks
+src/main/practice/        # Sanitize, compare, exercise runner
+src/main/pack/            # .plpack zip I/O
+src/main/store/           # Question bank (MySQL + JSON fallback)
+src/renderer/src/screens/ # Practice / Author / Demo
 ```
-
-## Milestone 1 (next)
-
-1. Pack format + MySQL schema for questions/attempts  
-2. Student: import → list → run query → check  
-3. Teacher: author → export; classroom demo UI  
-4. Portable MySQL + OS packaging  
-
-See project docs in the PortableLeetcode coordinator store for locked decisions.

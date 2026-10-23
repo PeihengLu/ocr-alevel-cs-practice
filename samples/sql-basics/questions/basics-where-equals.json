@@ -1,0 +1,22 @@
+{
+  "id": "basics-where-equals",
+  "version": 1,
+  "title": "3. Filter with WHERE =",
+  "prompt": "Use `WHERE` to keep only the rows you care about.\n\nReturn the `name` of every student in year group **12** (order does not matter).",
+  "starterQuery": "SELECT name\nFROM students\nWHERE ",
+  "solutionQuery": "SELECT name FROM students WHERE year_group = 12;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina" },
+        { "name": "Cara" },
+        { "name": "Dev" }
+      ]
+    }
+  ],
+  "tags": ["where", "equals"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

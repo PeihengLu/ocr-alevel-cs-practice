@@ -1,9 +1,17 @@
 export type {
+  CheckOutcome,
   PackManifest,
   PackPayload,
   PackExportResult,
   PackImportResult,
-  SqlQuestion
+  ProgressRecord,
+  QueryResultGrid,
+  QueryRunResult,
+  QuestionProgressStatus,
+  QuestionSummary,
+  SqlCheck,
+  SqlQuestion,
+  StorageStatus
 } from './types'
-export { importPack } from './import'
-export { exportPack } from './export'
+export { importPack, importPackPath } from './import'
+export { exportPack, exportPackPayload } from './export'

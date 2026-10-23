@@ -1,0 +1,10 @@
+{
+  "formatVersion": 1,
+  "packId": "intro-sql",
+  "version": "1.0.0",
+  "title": "Intro SQL (A-level friendly)",
+  "description": "Two starter SELECT questions over a tiny students/scores dataset.",
+  "createdAt": "2026-10-22T00:00:00.000Z",
+  "minAppVersion": "0.1.0",
+  "questionIds": ["select-all-students", "filter-year-12"]
+}

@@ -158,3 +158,539 @@ main {
 .btn:hover {
   filter: brightness(1.05);
 }
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.status-line,
+.flash,
+.todo-note {
+  max-width: 52rem;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 0.95rem;
+}
+
+.flash {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}
+
+.todo-note {
+  margin-top: 0.85rem;
+  color: var(--muted);
+}
+
+.practice-grid,
+.author-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(200px, 240px) minmax(220px, 280px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.author-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.9fr);
+}
+
+.author-side {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .practice-grid,
+  .author-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  max-height: 28rem;
+  overflow: auto;
+}
+
+.question-item {
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.question-item.active,
+.question-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.q-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.q-title {
+  font-weight: 600;
+}
+
+.progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.progress-icon {
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.progress-unseen {
+  color: var(--muted);
+}
+
+.progress-attempted {
+  color: #7a3e12;
+  border-color: color-mix(in srgb, #7a3e12 35%, var(--line));
+  background: color-mix(in srgb, #7a3e12 8%, var(--panel));
+}
+
+.progress-passed {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+}
+
+.filter-chip.active {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+}
+
+.runner-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.runner-toolbar h2 {
+  margin: 0;
+}
+
+.toolbar-actions {
+  margin-top: 0;
+  align-items: center;
+}
+
+.practice-focus .shell-header,
+.practice-focus .status-line,
+.practice-focus .flash {
+  display: none;
+}
+
+.focus-layout {
+  grid-template-columns: 1fr;
+}
+
+.focus-runner {
+  min-height: calc(100vh - 3.5rem);
+}
+
+.focus-editor {
+  min-height: 18rem;
+}
+
+.focus-hint {
+  margin: 0 0 0.75rem;
+}
+
+.q-meta,
+.tags {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.prompt {
+  white-space: pre-wrap;
+}
+
+.field-label,
+.form-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.code-input {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.55rem;
+}
+
+.code-input {
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.export-set {
+  border: 1px solid var(--line);
+  margin: 0 0 0.85rem;
+  padding: 0.55rem 0.7rem 0.7rem;
+}
+
+.export-set legend {
+  padding: 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.25rem 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.run-outcome {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.pass-banner,
+.fail-banner {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+}
+
+.pass-banner {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+.fail-banner {
+  border-color: color-mix(in srgb, #8b2e1a 35%, var(--line));
+  background: color-mix(in srgb, #8b2e1a 8%, var(--panel));
+}
+
+.check-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.check-pass {
+  color: var(--accent);
+}
+
+.check-fail {
+  color: #8b2e1a;
+}
+
+.result-heading {
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+}
+
+.result-scroll {
+  overflow: auto;
+  max-height: 16rem;
+  border: 1px solid var(--line);
+}
+
+.demo-result-wrap .result-scroll {
+  max-height: min(42vh, 28rem);
+}
+
+.demo-shell {
+  max-width: none;
+}
+
+.demo-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.demo-header h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+}
+
+.demo-status {
+  margin: 0;
+  align-self: flex-start;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.demo-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .demo-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.demo-sidebar h2 {
+  margin-top: 0;
+}
+
+.demo-dataset-note {
+  margin-top: 0;
+}
+
+.schema-block {
+  margin: 0.75rem 0 1.25rem;
+}
+
+.schema-table-name {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.schema-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.schema-table th,
+.schema-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.3rem 0.35rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lesson-heading {
+  margin: 1.25rem 0 0.5rem;
+}
+
+.lesson-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.lesson-step {
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.45rem;
+  row-gap: 0.1rem;
+}
+
+.lesson-step.active {
+  border-color: color-mix(in srgb, var(--teacher) 45%, var(--line));
+  background: color-mix(in srgb, var(--teacher) 8%, var(--panel));
+}
+
+.lesson-num {
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 1.2rem;
+}
+
+.lesson-label {
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--teacher);
+}
+
+.lesson-title {
+  font-size: 0.9rem;
+}
+
+.demo-stage {
+  display: grid;
+  gap: 1rem;
+}
+
+.demo-step-banner h2 {
+  margin: 0 0 0.35rem;
+}
+
+.talking-point {
+  margin: 0 0 0.85rem;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.example-chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.example-chip.active {
+  color: var(--accent-ink);
+  background: var(--teacher);
+  border-color: var(--teacher);
+}
+
+.demo-editor {
+  font-size: 1.05rem;
+  min-height: 10rem;
+  line-height: 1.5;
+}
+
+.demo-actions {
+  align-items: center;
+}
+
+.auto-run-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.demo-result-panel h2 {
+  margin-top: 0;
+}
+
+.demo-result-panel .result-table {
+  font-size: 1rem;
+}
+
+.demo-result-panel .result-table th,
+.demo-result-panel .result-table td {
+  padding: 0.5rem 0.65rem;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+}
+
+.result-table th,
+.result-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.result-table th {
+  background: color-mix(in srgb, var(--panel) 70%, var(--line));
+  position: sticky;
+  top: 0;
+}

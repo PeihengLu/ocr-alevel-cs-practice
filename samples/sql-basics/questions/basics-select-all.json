@@ -1,0 +1,18 @@
+{
+  "id": "basics-select-all",
+  "version": 1,
+  "title": "1. Select every column",
+  "prompt": "The school keeps a table called `students`.\n\nWrite a query that returns **every row** and **every column** from `students`.\n\nHint: use `SELECT *`.",
+  "starterQuery": "SELECT ",
+  "solutionQuery": "SELECT * FROM students;",
+  "checks": [
+    { "type": "row_count", "expected": 6 },
+    {
+      "type": "columns",
+      "expected": ["id", "name", "year_group", "house", "maths_score"]
+    }
+  ],
+  "tags": ["select", "basics"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}
