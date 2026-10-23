@@ -1,13 +1,28 @@
 # Vendor binaries (packaging)
 
-Place portable **MySQL** or **MariaDB** server binaries here during the packaging slice:
+## macOS
+
+Regenerate a relocatable MySQL tree from Homebrew (dev machine only):
+
+```bash
+brew install mysql          # once
+npm run vendor:mysql       # → vendor/mysql/ (gitignored)
+```
+
+Packaged apps copy this into `Contents/Resources/mysql` via electron-builder `extraResources`.
+
+## Windows
+
+Not staged on this Mac. On a Windows build host, place:
 
 ```
-vendor/mysql/mysqld          # macOS / Linux
-vendor/mysql/mysqld.exe      # Windows
-# or vendor/mariadb/mariadbd(.exe)
+vendor/mysql/bin/mysqld.exe
+vendor/mysql/bin/mysql.exe
+vendor/mysql/bin/mysqladmin.exe
+vendor/mysql/share/...
+vendor/mysql/lib/...       # required DLLs
 ```
 
-Electron packaged builds look under `resources/mysql` (copied by electron-builder). See `src/main/db/portableMysql.ts` and README **Packaging / portable ship**.
+Then `npm run build:teacher && npx electron-builder --win dir`.
 
-This folder is intentionally empty in source control — binaries are large and OS-specific.
+See README → Packaging / portable ship.

@@ -34,20 +34,43 @@ sql/<schemaRef>.sql
 
 Rebuild: `npm run sample:pack`.
 
-## Packaging / portable ship (product direction)
+## Packaging / portable ship
 
-**Students and classroom machines must not install anything.** Shipped Teacher/Student builds are self-contained folders (or `.app` / zip) that:
+**Students and classroom machines must not install anything.** Shipped builds are self-contained `.app` bundles (no installer, no Docker, no Homebrew).
 
-1. Bundle a **portable MySQL or MariaDB** binary per OS under e.g. `resources/mysql/` (or `vendor/mysql/` in the repo during packaging).
-2. On launch, Electron calls `ensureMysqlSidecar()` (`src/main/db/portableMysql.ts`) to start `mysqld` with:
-   - `--datadir` under the app-owned data directory (`MYSQL_DATA_DIR` / Electron `userData/mysql-data`)
-   - `--port` on an app-owned localhost port (`MYSQL_PORT`, default `3306` for now)
-3. On quit, `stopMysqlSidecar()` stops the process the app started.
-4. The UI always connects via `MYSQL_HOST` / `MYSQL_PORT` / `MYSQL_USER` / `MYSQL_PASSWORD` — never assuming Homebrew or Docker.
+### Double-click (macOS arm64, built on this Mac)
 
-**This PR** wires the connection + lifecycle *hooks* and the exercise runner. **It does not yet ship OS MySQL binaries.** Until packaging lands, developers point the same config at a local server (Homebrew recommended on this Mac).
+| Edition | Path |
+| --- | --- |
+| **Teacher** | `release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app` |
+| **Student** | `release/student-mac/mac-arm64/PortableLeetcode Student.app` |
 
-Set `MYSQL_PREFER_BUNDLED=1` later to prefer spawning a found bundled binary (start/stop implementation is the packaging slice).
+Full Teacher path:
+
+`/Users/peiheng/development/portable-leetcode/release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app`
+
+**Gatekeeper:** apps are unsigned. First open → right-click `.app` → **Open** → **Open**. Or `xattr -cr "…/PortableLeetcode Teacher.app"`.
+
+See also `release/HOW-TO-OPEN.md`.
+
+### What the packaged app does
+
+1. Bundles portable MySQL under `Contents/Resources/mysql` (staged via `npm run vendor:mysql` from Homebrew on the *build* Mac only).
+2. On launch, `ensureMysqlSidecar()` starts `mysqld` on **`127.0.0.1:13306`** with `--datadir` in `~/Library/Application Support/portable-leetcode/mysql-data`.
+3. On quit, `stopMysqlSidecar()` shuts it down.
+4. Sample packs ship in `Contents/Resources/samples/*.plpack`.
+
+### Rebuild packs (dev machine with Homebrew MySQL)
+
+```bash
+npm run pack:mac:teacher   # → release/teacher-mac/…
+npm run pack:mac:student   # → release/student-mac/…
+npm run pack:win           # stub note — build Win on a Windows host
+```
+
+### Windows
+
+Stubbed on this Mac (`npm run pack:win` prints steps). Needs a Windows-staged `vendor/mysql` + `electron-builder --win dir`.
 
 ## Dev MySQL on this Mac (Homebrew — not for students)
 
@@ -70,11 +93,11 @@ Defaults (`.env.example` / `src/main/db/config.ts`):
 | Variable | Default |
 | --- | --- |
 | `MYSQL_HOST` | `127.0.0.1` |
-| `MYSQL_PORT` | `3306` |
+| `MYSQL_PORT` | `3306` (dev) / **`13306`** (packaged / `MYSQL_PREFER_BUNDLED`) |
 | `MYSQL_USER` | `portable` |
 | `MYSQL_PASSWORD` | `portable` |
 | `MYSQL_DATABASE` | `portable_leetcode` |
-| `MYSQL_DATA_DIR` | `<userData>/mysql-data` (for future bundled mysqld) |
+| `MYSQL_DATA_DIR` | `<userData>/mysql-data` |
 
 Exercise sandbox DB: `pl_exercise` (created by the setup script / `sql/000_exercise_db.sql`).
 

@@ -40,3 +40,10 @@ coverage/
 content/*
 !content/.gitkeep
 !content/*.plpack
+
+# Staged portable MySQL (regenerate with npm run vendor:mysql)
+vendor/mysql/
+
+# Local mysqld datadir (dev experiments)
+.mysql-data/
+mysql-data/

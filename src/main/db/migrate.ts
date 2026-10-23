@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { app } from 'electron'
 import type { Connection } from 'mysql2/promise'
 
 /** Apply app schema SQL (idempotent CREATE TABLE IF NOT EXISTS). */
@@ -15,10 +16,12 @@ export async function migrateAppSchema(conn: Connection): Promise<void> {
 
 function resolveSchemaPath(): string {
   const candidates = [
+    app.isPackaged ? join(process.resourcesPath, 'sql', '001_app_schema.sql') : '',
     join(process.cwd(), 'sql', '001_app_schema.sql'),
     join(__dirname, '../../../sql/001_app_schema.sql'),
     join(__dirname, '../../../../sql/001_app_schema.sql')
-  ]
+  ].filter(Boolean)
+
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate
   }

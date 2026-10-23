@@ -5,6 +5,7 @@ import { registerIpcHandlers } from './ipc'
 import { initBank } from './store/bank'
 
 const isDev = !app.isPackaged
+let quitting = false
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -39,9 +40,11 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   registerIpcHandlers()
 
-  // Architecture hook: packaged builds will start a bundled mysqld here.
-  // Dev typically connects to an already-running local MySQL (e.g. Homebrew).
-  await ensureMysqlSidecar()
+  try {
+    await ensureMysqlSidecar()
+  } catch (err) {
+    console.error('[portable-leetcode] MySQL sidecar failed:', err)
+  }
 
   const status = await initBank()
   console.info('[portable-leetcode] storage:', status)
@@ -53,8 +56,17 @@ app.whenReady().then(async () => {
   })
 })
 
-app.on('before-quit', () => {
+app.on('before-quit', (event) => {
+  if (quitting) return
+  event.preventDefault()
+  quitting = true
   void stopMysqlSidecar()
+    .catch((err) => {
+      console.error('[portable-leetcode] error stopping mysqld:', err)
+    })
+    .finally(() => {
+      app.exit(0)
+    })
 })
 
 app.on('window-all-closed', () => {

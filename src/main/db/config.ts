@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+import { app } from 'electron'
 
 export interface MysqlConfig {
   host: string
@@ -6,37 +7,39 @@ export interface MysqlConfig {
   user: string
   password: string
   database: string
-  /**
-   * Data directory for a future bundled mysqld sidecar (next to the app when packaged).
-   * Unused until portable binary bundling lands — kept so connection lifecycle is ready.
-   */
+  /** Data directory for bundled mysqld (userData/mysql-data by default). */
   dataDir: string
-  /** When true, prefer starting/stopping a bundled mysqld (packaged builds). */
+  /** When true, start/stop a bundled mysqld if binary is present. */
   preferBundled: boolean
 }
 
+/** Default port for the app-owned bundled server (avoids clashing with system MySQL on 3306). */
+export const BUNDLED_MYSQL_PORT = 13306
+
 /**
- * Read MySQL settings from env.
+ * Read MySQL settings.
  *
- * Dev: point at Homebrew / local mysqld (or optional Docker).
- * Packaged: same knobs will target the app-owned localhost port + dataDir for a
- * bundled portable MySQL/MariaDB sidecar (see README “Packaging / portable ship”).
+ * Packaged builds default to bundled mysqld on localhost:13306.
+ * Dev builds default to Homebrew/local on 3306 unless MYSQL_PREFER_BUNDLED=1.
  */
 export function readMysqlConfig(userDataPath?: string): MysqlConfig {
-  const defaultDataDir = userDataPath
-    ? join(userDataPath, 'mysql-data')
-    : join(process.cwd(), '.mysql-data')
+  const packaged = typeof app !== 'undefined' && app.isPackaged
+  const dataRoot = userDataPath ?? (packaged ? app.getPath('userData') : process.cwd())
+  const preferBundled =
+    process.env.MYSQL_PREFER_BUNDLED === '1' ||
+    process.env.MYSQL_PREFER_BUNDLED === 'true' ||
+    (packaged && process.env.MYSQL_PREFER_BUNDLED !== '0')
+
+  const defaultPort = preferBundled ? BUNDLED_MYSQL_PORT : 3306
 
   return {
     host: process.env.MYSQL_HOST || '127.0.0.1',
-    port: Number(process.env.MYSQL_PORT || 3306),
+    port: Number(process.env.MYSQL_PORT || defaultPort),
     user: process.env.MYSQL_USER || 'portable',
     password: process.env.MYSQL_PASSWORD || 'portable',
     database: process.env.MYSQL_DATABASE || 'portable_leetcode',
-    dataDir: process.env.MYSQL_DATA_DIR || defaultDataDir,
-    preferBundled:
-      process.env.MYSQL_PREFER_BUNDLED === '1' ||
-      process.env.MYSQL_PREFER_BUNDLED === 'true'
+    dataDir: process.env.MYSQL_DATA_DIR || join(dataRoot, 'mysql-data'),
+    preferBundled
   }
 }
 

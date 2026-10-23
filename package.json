@@ -17,9 +17,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
     "sample:pack": "node scripts/build-sample-pack.mjs",
     "test:practice": "node --experimental-strip-types scripts/smoke-practice.mts",
-    "pack:dir": "electron-builder --dir",
-    "pack:mac": "electron-builder --mac dir",
-    "pack:win": "electron-builder --win dir"
+    "vendor:mysql": "node scripts/stage-mysql-mac.mjs",
+    "pack:mac:teacher": "npm run vendor:mysql && npm run sample:pack && npm run build:teacher && electron-builder --mac dir --config.productName=\"PortableLeetcode Teacher\" --config.appId=com.portableleetcode.teacher --config.directories.output=release/teacher-mac",
+    "pack:mac:student": "npm run vendor:mysql && npm run sample:pack && npm run build:student && electron-builder --mac dir --config.productName=\"PortableLeetcode Student\" --config.appId=com.portableleetcode.student --config.directories.output=release/student-mac",
+    "pack:mac": "npm run pack:mac:teacher",
+    "pack:win": "node scripts/pack-win-stub.mjs",
+    "pack:dir": "electron-builder --dir"
   },
   "dependencies": {
     "jszip": "^3.10.2",
@@ -51,11 +54,45 @@
     "files": [
       "out/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "vendor/mysql",
+        "to": "mysql",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "sql",
+        "to": "sql",
+        "filter": [
+          "**/*.sql"
+        ]
+      },
+      {
+        "from": "samples",
+        "to": "samples",
+        "filter": [
+          "**/*.plpack"
+        ]
+      },
+      {
+        "from": "content",
+        "to": "content",
+        "filter": [
+          "**/*.plpack"
+        ]
+      }
+    ],
+    "asar": true,
     "mac": {
       "target": [
         "dir"
       ],
-      "category": "public.app-category.education"
+      "category": "public.app-category.education",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "win": {
       "target": [
