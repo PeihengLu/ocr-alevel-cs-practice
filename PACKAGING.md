@@ -26,11 +26,13 @@ Bundled `mysqld` on `127.0.0.1:13306`, data in
 `~/Library/Application Support/portable-leetcode/mysql-data`.  
 Stops when you quit the app.
 
-## Teacher classroom demo
+## Teacher classroom demo (live lesson)
 
-1. Open **PortableLeetcode Teacher.app**
-2. **Practice** → Import `.plpack` → choose  
-   `…/PortableLeetcode Teacher.app/Contents/Resources/samples/sql-basics.plpack`  
-   (or the repo `samples/sql-basics.plpack`)
-3. **Demo** → pick a question → **Load solution** → **Run for class**
-4. **Author** → edit/save questions → **Export .plpack…** for students
+Demo is a **projector lesson tool** — walk through SQL on a sample `students` table (not pack authoring).
+
+1. Open **PortableLeetcode Teacher.app** (opens on **Demo**)
+2. Schema is on the left; click lesson chips (**SELECT ***, **WHERE**, **ORDER BY**, …)
+3. **Run for class** (or auto-run) shows a large result grid for the room
+4. Use **Author** / **Practice** separately to edit packs or try student practice
+5. Sample pack for students still lives at  
+   `…/Contents/Resources/samples/sql-basics.plpack`

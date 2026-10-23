@@ -1,5 +1,9 @@
 import type { FieldPacket, RowDataPacket } from 'mysql2'
 import mysql from 'mysql2/promise'
+import {
+  CLASSROOM_DEMO_ID,
+  CLASSROOM_SEED_SQL
+} from '../../shared/demo/classroom'
 import type { QueryRunResult, SqlQuestion } from '../../shared/pack/types'
 import { readMysqlConfig } from '../db/config'
 import {
@@ -152,6 +156,113 @@ export async function runDemoQuery(
     message: graded.passed
       ? 'Demo query ran and matches the packaged checks.'
       : 'Demo query ran (result shown). Packaged checks did not all pass.'
+  }
+}
+
+/**
+ * Classroom projection: run a SELECT against the built-in school demo schema.
+ * Does not touch student progress / attempts.
+ */
+export async function runClassroomQuery(rawSql: string): Promise<QueryRunResult> {
+  if (!getMysqlConnected()) {
+    return {
+      ok: false,
+      passed: false,
+      questionId: CLASSROOM_DEMO_ID,
+      sql: rawSql,
+      message:
+        'MySQL is not connected. Packaged Teacher apps start bundled mysqld automatically; for dev use Homebrew MySQL (see README).'
+    }
+  }
+
+  let safeSql: string
+  try {
+    safeSql = assertSafeSelect(rawSql)
+  } catch (err) {
+    return {
+      ok: false,
+      passed: false,
+      questionId: CLASSROOM_DEMO_ID,
+      sql: rawSql,
+      message: err instanceof Error ? err.message : String(err)
+    }
+  }
+
+  const cfg = readMysqlConfig()
+
+  try {
+    await prepareExerciseSchema(cfg, CLASSROOM_SEED_SQL)
+
+    const student = await mysql.createConnection({
+      host: cfg.host,
+      port: cfg.port,
+      user: cfg.user,
+      password: cfg.password,
+      database: EXERCISE_DATABASE,
+      multipleStatements: false,
+      dateStrings: true
+    })
+
+    try {
+      await student.query('SET SESSION TRANSACTION READ ONLY')
+      await student.beginTransaction()
+
+      let rows: RowDataPacket[]
+      let fields: FieldPacket[]
+      try {
+        const result = await student.query<RowDataPacket[]>(safeSql)
+        rows = result[0]
+        fields = result[1]
+        await student.rollback()
+      } catch (err) {
+        try {
+          await student.rollback()
+        } catch {
+          // ignore
+        }
+        throw err
+      }
+
+      if (!Array.isArray(rows)) {
+        return {
+          ok: false,
+          passed: false,
+          questionId: CLASSROOM_DEMO_ID,
+          sql: safeSql,
+          message: 'Query did not return a result set (SELECT required).'
+        }
+      }
+
+      const columns =
+        fields?.map((f) => f.name).filter((name): name is string => Boolean(name)) ??
+        (rows[0] ? Object.keys(rows[0]) : [])
+
+      const grid = toGrid(
+        columns,
+        rows.map((row) => ({ ...(row as Record<string, unknown>) }))
+      )
+
+      return {
+        ok: true,
+        passed: true,
+        questionId: CLASSROOM_DEMO_ID,
+        sql: safeSql,
+        result: grid,
+        checks: [],
+        message: `Result — ${grid.rows.length} row${grid.rows.length === 1 ? '' : 's'}.`
+      }
+    } finally {
+      await student.end()
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return {
+      ok: false,
+      passed: false,
+      questionId: CLASSROOM_DEMO_ID,
+      sql: rawSql,
+      message: `Query failed: ${message}`
+    }
   }
 }
 

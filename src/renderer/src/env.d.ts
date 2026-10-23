@@ -157,6 +157,7 @@ interface PortableLeetcodeBridge {
   exportPackPayload(payload: PackPayload): Promise<PackExportResult>
   runQuery(questionId: string, sql: string): Promise<QueryRunResult>
   runDemo(questionId: string, sql?: string): Promise<QueryRunResult>
+  runClassroomSql(sql: string): Promise<QueryRunResult>
 }
 
 interface Window {

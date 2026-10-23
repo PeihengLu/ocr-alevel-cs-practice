@@ -71,6 +71,11 @@ const api = {
 
   runDemo(questionId: string, sql?: string): Promise<QueryRunResult> {
     return ipcRenderer.invoke('practice:runDemo', { questionId, sql })
+  },
+
+  /** Classroom Demo: project SELECT against the built-in school dataset. */
+  runClassroomSql(sql: string): Promise<QueryRunResult> {
+    return ipcRenderer.invoke('demo:runClassroomSql', sql)
   }
 }
 

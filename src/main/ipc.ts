@@ -10,7 +10,11 @@ import type {
   StorageStatus
 } from '../shared/pack/types'
 import { packPlpack, unpackPlpack } from './pack/zip'
-import { runDemoQuery, runStudentQuery } from './practice/runner'
+import {
+  runClassroomQuery,
+  runDemoQuery,
+  runStudentQuery
+} from './practice/runner'
 import {
   buildPackFromQuestionIds,
   getQuestion,
@@ -206,6 +210,12 @@ export function registerIpcHandlers(): void {
       }
       return runDemoQuery(q, sql)
     }
+  )
+
+  /** Live classroom projection — built-in school schema, no pack required. */
+  ipcMain.handle(
+    'demo:runClassroomSql',
+    async (_e, sql: string): Promise<QueryRunResult> => runClassroomQuery(sql)
   )
 }
 
