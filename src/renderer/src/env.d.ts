@@ -83,6 +83,21 @@ interface StorageStatus {
   questionCount: number
 }
 
+type QuestionProgressStatus = 'unseen' | 'attempted' | 'passed'
+
+interface ProgressRecord {
+  questionId: string
+  status: QuestionProgressStatus
+  bestPassed: boolean
+  attemptCount: number
+  lastAttemptAt: string | null
+}
+
+interface QuestionSummary {
+  question: SqlQuestion
+  progress: ProgressRecord
+}
+
 interface QueryResultGrid {
   columns: string[]
   rows: Record<string, unknown>[]
@@ -120,6 +135,7 @@ interface PortableLeetcodeBridge {
   editions: readonly Edition[]
   getStorageStatus(): Promise<StorageStatus>
   listQuestions(): Promise<SqlQuestion[]>
+  listQuestionSummaries(): Promise<QuestionSummary[]>
   getQuestion(id: string): Promise<SqlQuestion | null>
   getSqlAsset(schemaRef: string): Promise<string | null>
   upsertQuestion(

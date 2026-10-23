@@ -141,6 +141,22 @@ export interface AttemptRecord {
   createdAt: string
 }
 
+/** Per-question practice status (best-effort: once passed, stays passed). */
+export type QuestionProgressStatus = 'unseen' | 'attempted' | 'passed'
+
+export interface ProgressRecord {
+  questionId: string
+  status: QuestionProgressStatus
+  bestPassed: boolean
+  attemptCount: number
+  lastAttemptAt: string | null
+}
+
+export interface QuestionSummary {
+  question: SqlQuestion
+  progress: ProgressRecord
+}
+
 export interface BankSnapshot {
   questions: Record<string, SqlQuestion>
   packs: Record<
@@ -153,5 +169,7 @@ export interface BankSnapshot {
     }
   >
   attempts: AttemptRecord[]
+  /** Best status per question id. */
+  progress: Record<string, ProgressRecord>
   sqlAssets: Record<string, string>
 }

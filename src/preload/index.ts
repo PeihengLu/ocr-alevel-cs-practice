@@ -4,6 +4,7 @@ import type {
   PackImportResult,
   PackPayload,
   QueryRunResult,
+  QuestionSummary,
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
@@ -18,6 +19,10 @@ const api = {
 
   listQuestions(): Promise<SqlQuestion[]> {
     return ipcRenderer.invoke('bank:listQuestions')
+  },
+
+  listQuestionSummaries(): Promise<QuestionSummary[]> {
+    return ipcRenderer.invoke('bank:listQuestionSummaries')
   },
 
   getQuestion(id: string): Promise<SqlQuestion | null> {

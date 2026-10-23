@@ -1,4 +1,9 @@
-import type { BankSnapshot, PackPayload, SqlQuestion } from './types'
+import type {
+  BankSnapshot,
+  PackPayload,
+  ProgressRecord,
+  SqlQuestion
+} from './types'
 
 export interface MergeStats {
   merged: number
@@ -34,10 +39,13 @@ export function mergePackIntoBank(
     sqlAssets[ref] = sql
   }
 
+  const progress = { ...bank.progress }
+
   let retired = 0
   for (const id of pack.manifest.retiredIds ?? []) {
     if (id in questions) {
       delete questions[id]
+      delete progress[id]
       retired += 1
     }
   }
@@ -57,7 +65,8 @@ export function mergePackIntoBank(
       ...bank,
       questions,
       sqlAssets,
-      packs
+      packs,
+      progress
     },
     stats: { merged, skipped, retired }
   }
@@ -68,7 +77,18 @@ export function emptyBank(): BankSnapshot {
     questions: {},
     packs: {},
     attempts: [],
+    progress: {},
     sqlAssets: {}
+  }
+}
+
+export function defaultProgress(questionId: string): ProgressRecord {
+  return {
+    questionId,
+    status: 'unseen',
+    bestPassed: false,
+    attemptCount: 0,
+    lastAttemptAt: null
   }
 }
 

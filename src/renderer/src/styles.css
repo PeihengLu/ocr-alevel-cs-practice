@@ -241,7 +241,7 @@ main {
   padding: 0.55rem 0.65rem;
   cursor: pointer;
   display: grid;
-  gap: 0.15rem;
+  gap: 0.25rem;
 }
 
 .question-item.active,
@@ -249,8 +249,113 @@ main {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
 }
 
+.q-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .q-title {
   font-weight: 600;
+}
+
+.progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.progress-icon {
+  font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+}
+
+.progress-unseen {
+  color: var(--muted);
+}
+
+.progress-attempted {
+  color: #7a3e12;
+  border-color: color-mix(in srgb, #7a3e12 35%, var(--line));
+  background: color-mix(in srgb, #7a3e12 8%, var(--panel));
+}
+
+.progress-passed {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.filter-chip {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+}
+
+.filter-chip.active {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+}
+
+.runner-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.runner-toolbar h2 {
+  margin: 0;
+}
+
+.toolbar-actions {
+  margin-top: 0;
+  align-items: center;
+}
+
+.practice-focus .shell-header,
+.practice-focus .status-line,
+.practice-focus .flash {
+  display: none;
+}
+
+.focus-layout {
+  grid-template-columns: 1fr;
+}
+
+.focus-runner {
+  min-height: calc(100vh - 3.5rem);
+}
+
+.focus-editor {
+  min-height: 18rem;
+}
+
+.focus-hint {
+  margin: 0 0 0.75rem;
 }
 
 .q-meta,

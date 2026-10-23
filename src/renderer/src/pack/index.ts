@@ -4,8 +4,11 @@ export type {
   PackPayload,
   PackExportResult,
   PackImportResult,
+  ProgressRecord,
   QueryResultGrid,
   QueryRunResult,
+  QuestionProgressStatus,
+  QuestionSummary,
   SqlCheck,
   SqlQuestion,
   StorageStatus

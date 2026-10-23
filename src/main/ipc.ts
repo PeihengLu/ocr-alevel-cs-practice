@@ -5,6 +5,7 @@ import type {
   PackImportResult,
   PackPayload,
   QueryRunResult,
+  QuestionSummary,
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
@@ -16,6 +17,7 @@ import {
   getSqlAsset,
   getStorageStatus,
   importPackPayload,
+  listQuestionSummaries,
   listQuestions,
   upsertAuthoredQuestion
 } from './store/bank'
@@ -24,6 +26,11 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('storage:status', (): StorageStatus => getStorageStatus())
 
   ipcMain.handle('bank:listQuestions', (): SqlQuestion[] => listQuestions())
+
+  ipcMain.handle(
+    'bank:listQuestionSummaries',
+    (): QuestionSummary[] => listQuestionSummaries()
+  )
 
   ipcMain.handle(
     'bank:getQuestion',
