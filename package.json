@@ -1,37 +1,34 @@
 {
   "name": "portable-leetcode",
-  "version": "0.1.0",
-  "description": "Offline plug-and-play coding practice — SQL demos and student practice (Teacher/Student editions from one codebase)",
+  "version": "0.2.0",
+  "description": "Offline plug-and-play coding practice for SQL and Python",
   "main": "./out/main/index.js",
   "author": "PeihengLu",
   "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "electron-vite dev",
-    "dev:student": "cross-env VITE_EDITION=student electron-vite dev",
-    "dev:teacher": "cross-env VITE_EDITION=teacher electron-vite dev",
     "build": "electron-vite build",
-    "build:student": "cross-env VITE_EDITION=student electron-vite build",
-    "build:teacher": "cross-env VITE_EDITION=teacher electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
     "sample:pack": "node scripts/build-sample-pack.mjs",
-    "test:practice": "node --experimental-strip-types scripts/smoke-practice.mts",
-    "vendor:mysql": "node scripts/stage-mysql-mac.mjs",
-    "vendor:mysql:win": "node scripts/stage-mysql-win.mjs",
-    "pack:mac:teacher": "npm run vendor:mysql && npm run sample:pack && npm run build:teacher && electron-builder --mac dir --config.productName=\"PortableLeetcode Teacher\" --config.appId=com.portableleetcode.teacher --config.directories.output=release/teacher-mac",
-    "pack:mac:student": "npm run vendor:mysql && npm run sample:pack && npm run build:student && electron-builder --mac dir --config.productName=\"PortableLeetcode Student\" --config.appId=com.portableleetcode.student --config.directories.output=release/student-mac",
-    "pack:mac": "npm run pack:mac:teacher",
-    "pack:win:student": "npm run vendor:mysql:win && npm run sample:pack && npm run build:student && electron-builder --win dir portable --x64 --config.productName=\"PortableLeetcode Student\" --config.appId=com.portableleetcode.student --config.directories.output=release/student-win",
-    "dist:student:win": "npm run pack:win:student",
-    "pack:win": "npm run pack:win:student",
+    "test:practice": "node --experimental-strip-types scripts/smoke-practice.mts && node --experimental-strip-types scripts/smoke-python.mts && node --experimental-strip-types scripts/smoke-sql.mts",
+    "pack:mac": "npm run sample:pack && npm run build && electron-builder --mac dir",
+    "pack:win": "npm run sample:pack && npm run build && electron-builder --win dir portable --x64",
+    "dist:win": "npm run pack:win",
+    "deploy": "node scripts/deploy.mjs",
     "pack:dir": "electron-builder --dir"
   },
   "dependencies": {
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/language": "^6.13.1",
+    "codemirror": "^6.0.2",
     "jszip": "^3.10.2",
-    "mysql2": "^3.24.6",
+    "pyodide": "^314.0.7",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "sql.js": "^1.15.2"
   },
   "devDependencies": {
     "@types/jszip": "^3.4.0",
@@ -40,7 +37,6 @@
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.0.4",
     "concurrently": "^9.2.1",
-    "cross-env": "^10.1.0",
     "electron": "^38.2.2",
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",
@@ -54,8 +50,15 @@
     "directories": {
       "output": "release"
     },
+    "electronLanguages": [
+      "en-US"
+    ],
     "files": [
-      "out/**/*"
+      "out/**/*",
+      "!node_modules/pyodide/**/*",
+      "!node_modules/react/**/*",
+      "!node_modules/react-dom/**/*",
+      "!node_modules/sql.js/dist/*.wasm"
     ],
     "extraResources": [
       {
@@ -66,10 +69,12 @@
         ]
       },
       {
-        "from": "samples",
-        "to": "samples",
+        "from": "samples/sql-basics",
+        "to": "samples/sql-basics",
         "filter": [
-          "**/*.plpack"
+          "manifest.json",
+          "questions/**/*.json",
+          "sql/**/*.sql"
         ]
       },
       {
@@ -77,6 +82,26 @@
         "to": "content",
         "filter": [
           "**/*.plpack"
+        ]
+      },
+      {
+        "from": "src/main/python/python-run.mjs",
+        "to": "python/python-run.mjs"
+      },
+      {
+        "from": "node_modules/sql.js/dist/sql-wasm.wasm",
+        "to": "sqlite/sql-wasm.wasm"
+      },
+      {
+        "from": "node_modules/pyodide",
+        "to": "pyodide",
+        "filter": [
+          "pyodide.mjs",
+          "pyodide.asm.mjs",
+          "pyodide.asm.wasm",
+          "python_stdlib.zip",
+          "pyodide-lock.json",
+          "package.json"
         ]
       }
     ],
@@ -88,32 +113,14 @@
       "category": "public.app-category.education",
       "identity": null,
       "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "extraResources": [
-        {
-          "from": "vendor/mysql",
-          "to": "mysql",
-          "filter": [
-            "**/*"
-          ]
-        }
-      ]
+      "gatekeeperAssess": false
     },
     "win": {
       "target": [
         "dir",
         "portable"
       ],
-      "artifactName": "${productName}-${version}-portable.${ext}",
-      "extraResources": [
-        {
-          "from": "vendor/mysql-win",
-          "to": "mysql",
-          "filter": [
-            "**/*"
-          ]
-        }
-      ]
+      "artifactName": "${productName}-${version}-portable.${ext}"
     }
   }
 }

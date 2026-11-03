@@ -1,3 +1,4 @@
+import { compareNumberedTitles } from '../order'
 import type {
   BankSnapshot,
   PackPayload,
@@ -94,7 +95,7 @@ export function defaultProgress(questionId: string): ProgressRecord {
 
 export function questionsFromBank(bank: BankSnapshot): SqlQuestion[] {
   return Object.values(bank.questions).sort((a, b) =>
-    a.title.localeCompare(b.title)
+    compareNumberedTitles(a.title, b.title)
   )
 }
 

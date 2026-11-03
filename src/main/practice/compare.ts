@@ -134,7 +134,7 @@ function normalizeValue(value: unknown): unknown {
     return iso.endsWith('T00:00:00.000Z') ? iso.slice(0, 10) : iso
   }
   if (typeof value === 'object' && value !== null) {
-    // mysql2 DECIMAL sometimes comes as string already; leave objects as JSON.
+    // Leave objects as JSON so row comparison stays stable.
     return JSON.parse(JSON.stringify(value)) as unknown
   }
   return value

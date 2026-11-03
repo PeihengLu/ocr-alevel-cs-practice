@@ -1,77 +1,62 @@
 # Opening PortableLeetcode (no install)
 
-Shipped builds are **installer-free** with a bundled MySQL/MariaDB. Students do **not** need Docker, Homebrew, or a system MySQL.
+Shipped builds are **installer-free**. SQL runs in bundled SQLite, so the computer that runs the app does not need Docker, Homebrew, or a database server.
 
-## macOS — Teacher (already available)
+## macOS
 
-| Edition | App |
-| --- | --- |
-| **Teacher** | `release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app` |
-| **Student** | `release/student-mac/mac-arm64/PortableLeetcode Student.app` |
-
-Absolute Teacher path on this Mac:
-
-`/Users/peiheng/development/portable-leetcode/release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app`
+`release/mac-arm64/PortableLeetcode.app`
 
 ### Gatekeeper (first open)
 
-Apps are **unsigned** (no Apple Developer ID). If macOS blocks double-click:
+The app is **unsigned** (no Apple Developer ID). If macOS blocks double-click:
 
 1. **Finder** → right-click (or Control-click) the `.app` → **Open** → **Open**
-2. Or once: `xattr -cr "/path/to/PortableLeetcode Teacher.app"` then double-click
+2. Or once: `xattr -cr "/path/to/PortableLeetcode.app"` then double-click
 
 No installer. Copy the `.app` anywhere (USB, Desktop).
 
-### What starts automatically (Mac)
+### What the app stores (Mac)
 
-Bundled `mysqld` on `127.0.0.1:13306`, data in  
-`~/Library/Application Support/portable-leetcode/mysql-data`.  
-Stops when you quit the app.
+Progress is a SQLite file, `portable-leetcode.sqlite`, in the app's user-data folder. Each Run Query uses a temporary in-memory database. Nothing is left listening on a port when you quit.
 
-## Windows — Student (portable)
+Build with `npm run pack:mac`, or both platforms with `npm run deploy`. Electron ships its English locale pack only.
+
+## Windows (portable)
 
 | Artifact | Path |
 | --- | --- |
-| Unpacked folder (always) | `release/student-win/win-unpacked/` → run `PortableLeetcode Student.exe` |
-| Portable exe (when build host can produce it) | `release/student-win/PortableLeetcode Student-0.1.0-portable.exe` |
+| Unpacked folder (always) | `release/win-unpacked/` → run `PortableLeetcode.exe` |
+| Portable exe (when the build host can produce it) | `release/PortableLeetcode-0.1.0-portable.exe` |
 | Zip handoff (optional) | Zip the `win-unpacked` folder or ship the portable `.exe` |
 
-### How students get it
+### How to hand it over
 
-1. Receive a zip (or USB copy) of either:
+1. Send a zip (or USB copy) of either:
    - the portable `.exe`, **or**
    - the `win-unpacked` folder
 2. Unzip if needed
-3. Double-click **PortableLeetcode Student.exe** (or the portable exe)
-4. No installer, no Docker, no Homebrew, no system MySQL
+3. Double-click **PortableLeetcode.exe** (or the portable exe)
+4. No installer and no database server to set up
 
 Windows Defender / SmartScreen may warn on unsigned builds — choose **More info** → **Run anyway**.
 
-### What starts automatically (Windows)
+### What the app stores (Windows)
 
-Bundled MariaDB (`resources/mysql/bin/mysqld.exe` + `server.dll`) on `127.0.0.1:13306`, data under  
-`%APPDATA%\portable-leetcode\mysql-data` (Electron `userData`).  
-Stops when you quit the app.
+Progress is `portable-leetcode.sqlite` under the app's user-data folder (`%APPDATA%`). Each Run Query uses a temporary in-memory database.
 
 ### Build (maintainers)
 
 ```bash
-# Stages official MariaDB winx64 into vendor/mysql-win (not the Mac tree)
-npm run dist:student:win
-# alias: npm run pack:win:student
+# Mac zip and Windows zip, side by side in release/deploy/
+npm run deploy
+
+# Or one platform:
+npm run pack:mac
+npm run dist:win
 ```
 
 - **From macOS:** electron-builder can emit `win-unpacked/` without Wine. The NSIS **portable** `.exe` may require Wine; if it fails, ship a zip of `win-unpacked/` or rebuild on Windows.
 - **From Windows:** same command; prefer the portable `.exe` for single-file handoff.
-- Mac MySQL (`vendor/mysql`) is **never** copied into the Windows build (`win.extraResources` → `vendor/mysql-win` only).
+- SQLite ships as one wasm file (`sql-wasm.wasm`, about 670 KB) beside the app. The same file is used on Mac and Windows.
 
-## Teacher classroom demo (live lesson)
-
-Demo is a **projector lesson tool** — walk through SQL on a sample `students` table (not pack authoring).
-
-1. Open **PortableLeetcode Teacher.app** (opens on **Demo**)
-2. Schema is on the left; click lesson chips (**SELECT ***, **WHERE**, **ORDER BY**, …)
-3. **Run for class** (or auto-run) shows a large result grid for the room
-4. Use **Author** / **Practice** separately to edit packs or try student practice
-5. Sample pack for students still lives at  
-   `…/Contents/Resources/samples/sql-basics.plpack`
+SQL questions ship in `Contents/Resources/samples/sql-basics` (Mac) or `resources/samples/sql-basics` (Windows) and load on startup. Python chapters are built into the app.

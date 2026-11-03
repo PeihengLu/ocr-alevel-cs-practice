@@ -1,17 +1,36 @@
-import { existsSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { app } from 'electron'
-import type { Connection } from 'mysql2/promise'
+import type { Database } from 'sql.js'
+import { queryRows, run } from './sqlite'
+
+const ADDED_COLUMNS: Record<string, Record<string, string>> = {
+  questions: {
+    effect_query: 'TEXT',
+    statement: 'TEXT'
+  }
+}
 
 /** Apply app schema SQL (idempotent CREATE TABLE IF NOT EXISTS). */
-export async function migrateAppSchema(conn: Connection): Promise<void> {
-  const schemaPath = resolveSchemaPath()
-  const sql = await readFile(schemaPath, 'utf8')
-  const statements = splitSqlStatements(sql)
-  for (const statement of statements) {
-    await conn.query(statement)
+export function migrateAppSchema(db: Database): void {
+  db.run('PRAGMA foreign_keys = ON')
+  db.exec(readFileSync(resolveSchemaPath(), 'utf8'))
+  for (const [table, columns] of Object.entries(ADDED_COLUMNS)) {
+    for (const [column, definition] of Object.entries(columns)) {
+      ensureColumn(db, table, column, definition)
+    }
   }
+}
+
+function ensureColumn(
+  db: Database,
+  table: string,
+  column: string,
+  definition: string
+): void {
+  const rows = queryRows(db, `PRAGMA table_info(${table})`)
+  if (rows.some((row) => String(row.name) === column)) return
+  run(db, `ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
 }
 
 function resolveSchemaPath(): string {
@@ -25,20 +44,5 @@ function resolveSchemaPath(): string {
   for (const candidate of candidates) {
     if (existsSync(candidate)) return candidate
   }
-  throw new Error(
-    `Could not find sql/001_app_schema.sql (tried: ${candidates.join(', ')})`
-  )
-}
-
-function splitSqlStatements(sql: string): string[] {
-  return sql
-    .split(/;\s*\n/)
-    .map((s) =>
-      s
-        .split('\n')
-        .filter((line) => !line.trim().startsWith('--'))
-        .join('\n')
-        .trim()
-    )
-    .filter((s) => s.length > 0)
+  throw new Error(`Could not find sql/001_app_schema.sql (tried: ${candidates.join(', ')})`)
 }

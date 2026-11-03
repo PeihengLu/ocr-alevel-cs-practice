@@ -1,7 +1,7 @@
-import { dialog, ipcMain } from 'electron'
-import { readFile, writeFile } from 'node:fs/promises'
+import { app, dialog, ipcMain } from 'electron'
+import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import type {
-  PackExportResult,
   PackImportResult,
   PackPayload,
   QueryRunResult,
@@ -9,59 +9,44 @@ import type {
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
-import { packPlpack, unpackPlpack } from './pack/zip'
+import { unpackPlpack } from './pack/zip'
+import { runStudentQuery } from './practice/runner'
+import { runLinkedListExercise, type PythonRunResult } from './python/linkedListRun'
+import type { PythonPaths } from './python/session'
 import {
-  runClassroomQuery,
-  runDemoQuery,
-  runStudentQuery
-} from './practice/runner'
-import {
-  buildPackFromQuestionIds,
   getQuestion,
   getSqlAsset,
   getStorageStatus,
   importPackPayload,
   listQuestionSummaries,
-  listQuestions,
-  upsertAuthoredQuestion
+  listQuestions
 } from './store/bank'
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('storage:status', (): StorageStatus => getStorageStatus())
 
-  ipcMain.handle('bank:listQuestions', (): SqlQuestion[] => listQuestions())
+  ipcMain.handle('bank:listQuestions', (): SqlQuestion[] =>
+    listQuestions().map(hideSolution)
+  )
 
-  ipcMain.handle(
-    'bank:listQuestionSummaries',
-    (): QuestionSummary[] => listQuestionSummaries()
+  ipcMain.handle('bank:listQuestionSummaries', (): QuestionSummary[] =>
+    listQuestionSummaries().map((item) => ({
+      ...item,
+      question: hideSolution(item.question)
+    }))
   )
 
   ipcMain.handle(
     'bank:getQuestion',
-    (_e, id: string): SqlQuestion | null => getQuestion(id)
+    (_e, id: string): SqlQuestion | null => {
+      const question = getQuestion(id)
+      return question ? hideSolution(question) : null
+    }
   )
 
   ipcMain.handle(
     'bank:getSqlAsset',
     (_e, schemaRef: string): string | null => getSqlAsset(schemaRef)
-  )
-
-  ipcMain.handle(
-    'bank:upsertQuestion',
-    async (
-      _e,
-      payload: { question: SqlQuestion; sqlAsset?: string }
-    ): Promise<{ ok: true } | { ok: false; error: string }> => {
-      try {
-        await upsertAuthoredQuestion(payload.question, payload.sqlAsset)
-        return { ok: true }
-      } catch (err) {
-        return {
-          ok: false,
-          error: err instanceof Error ? err.message : String(err)
-        }
-      }
-    }
   )
 
   ipcMain.handle('pack:import', async (): Promise<PackImportResult> => {
@@ -83,7 +68,7 @@ export function registerIpcHandlers(): void {
       const stats = await importPackPayload(pack)
       return {
         ok: true,
-        pack,
+        pack: hidePackSolutions(pack),
         merged: stats.merged,
         skipped: stats.skipped,
         retired: stats.retired,
@@ -106,53 +91,12 @@ export function registerIpcHandlers(): void {
         const stats = await importPackPayload(pack)
         return {
           ok: true,
-          pack,
+          pack: hidePackSolutions(pack),
           merged: stats.merged,
           skipped: stats.skipped,
           retired: stats.retired,
           storage: getStorageStatus().backend
         }
-      } catch (err) {
-        return {
-          ok: false,
-          error: err instanceof Error ? err.message : String(err)
-        }
-      }
-    }
-  )
-
-  ipcMain.handle(
-    'pack:export',
-    async (
-      _e,
-      args: {
-        meta: {
-          packId: string
-          version: string
-          title: string
-          description?: string
-          retiredIds?: string[]
-        }
-        questionIds: string[]
-      }
-    ): Promise<PackExportResult> => {
-      try {
-        const payload = await buildPackFromQuestionIds(args.meta, args.questionIds)
-        return await writePackWithDialog(payload)
-      } catch (err) {
-        return {
-          ok: false,
-          error: err instanceof Error ? err.message : String(err)
-        }
-      }
-    }
-  )
-
-  ipcMain.handle(
-    'pack:exportPayload',
-    async (_e, payload: PackPayload): Promise<PackExportResult> => {
-      try {
-        return await writePackWithDialog(payload)
       } catch (err) {
         return {
           ok: false,
@@ -183,58 +127,35 @@ export function registerIpcHandlers(): void {
   )
 
   ipcMain.handle(
-    'practice:runDemo',
-    async (
-      _e,
-      args: { questionId: string; sql?: string }
-    ): Promise<QueryRunResult> => {
-      const q = getQuestion(args.questionId)
-      if (!q) {
-        return {
-          ok: false,
-          passed: false,
-          message: `Unknown question "${args.questionId}"`,
-          questionId: args.questionId,
-          sql: args.sql ?? ''
-        }
-      }
-      const sql = (args.sql ?? q.solutionQuery ?? q.starterQuery).trim()
-      if (!sql) {
-        return {
-          ok: false,
-          passed: false,
-          message: 'No solution or starter query available for this question.',
-          questionId: args.questionId,
-          sql: ''
-        }
-      }
-      return runDemoQuery(q, sql)
-    }
-  )
-
-  /** Live classroom projection — built-in school schema, no pack required. */
-  ipcMain.handle(
-    'demo:runClassroomSql',
-    async (_e, sql: string): Promise<QueryRunResult> => runClassroomQuery(sql)
+    'python:runLinkedList',
+    async (_e, args: { exerciseId: string; code: string }): Promise<PythonRunResult> =>
+      runLinkedListExercise(pythonPaths(), args.exerciseId, args.code)
   )
 }
 
-async function writePackWithDialog(payload: PackPayload): Promise<PackExportResult> {
-  const suggested = `${payload.manifest.packId}-v${payload.manifest.version}.plpack`
-  const saved = await dialog.showSaveDialog({
-    title: 'Export question pack',
-    defaultPath: suggested,
-    filters: [{ name: 'PortableLeetcode pack', extensions: ['plpack'] }]
-  })
-  if (saved.canceled || !saved.filePath) {
-    return { ok: false, error: 'Export cancelled.', cancelled: true }
+/** Answer keys stay in the bank. The practice window does not receive them. */
+function hideSolution(question: SqlQuestion): SqlQuestion {
+  if (question.solutionQuery === undefined) return question
+  const next = { ...question }
+  delete next.solutionQuery
+  return next
+}
+
+function hidePackSolutions(pack: PackPayload): PackPayload {
+  return {
+    ...pack,
+    questions: pack.questions.map(hideSolution)
   }
+}
 
-  const path = saved.filePath.endsWith('.plpack')
-    ? saved.filePath
-    : `${saved.filePath}.plpack`
-
-  const buffer = await packPlpack(payload)
-  await writeFile(path, buffer)
-  return { ok: true, path }
+function pythonPaths(): PythonPaths {
+  return {
+    execPath: process.execPath,
+    runnerPath: app.isPackaged
+      ? join(process.resourcesPath, 'python', 'python-run.mjs')
+      : join(process.cwd(), 'src/main/python/python-run.mjs'),
+    pyodideDir: app.isPackaged
+      ? join(process.resourcesPath, 'pyodide')
+      : join(process.cwd(), 'node_modules/pyodide')
+  }
 }

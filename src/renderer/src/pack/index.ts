@@ -2,7 +2,6 @@ export type {
   CheckOutcome,
   PackManifest,
   PackPayload,
-  PackExportResult,
   PackImportResult,
   ProgressRecord,
   QueryResultGrid,
@@ -14,4 +13,3 @@ export type {
   StorageStatus
 } from './types'
 export { importPack, importPackPath } from './import'
-export { exportPack, exportPackPayload } from './export'

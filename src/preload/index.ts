@@ -1,17 +1,15 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
-  PackExportResult,
   PackImportResult,
-  PackPayload,
   QueryRunResult,
   QuestionSummary,
   SqlQuestion,
   StorageStatus
 } from '../shared/pack/types'
+import type { PythonRunResult } from '../shared/python/report'
 
 const api = {
   platform: process.platform,
-  editions: ['student', 'teacher'] as const,
 
   getStorageStatus(): Promise<StorageStatus> {
     return ipcRenderer.invoke('storage:status')
@@ -33,13 +31,6 @@ const api = {
     return ipcRenderer.invoke('bank:getSqlAsset', schemaRef)
   },
 
-  upsertQuestion(
-    question: SqlQuestion,
-    sqlAsset?: string
-  ): Promise<{ ok: true } | { ok: false; error: string }> {
-    return ipcRenderer.invoke('bank:upsertQuestion', { question, sqlAsset })
-  },
-
   importPack(): Promise<PackImportResult> {
     return ipcRenderer.invoke('pack:import')
   },
@@ -48,34 +39,13 @@ const api = {
     return ipcRenderer.invoke('pack:importPath', filePath)
   },
 
-  exportPack(args: {
-    meta: {
-      packId: string
-      version: string
-      title: string
-      description?: string
-      retiredIds?: string[]
-    }
-    questionIds: string[]
-  }): Promise<PackExportResult> {
-    return ipcRenderer.invoke('pack:export', args)
-  },
-
-  exportPackPayload(payload: PackPayload): Promise<PackExportResult> {
-    return ipcRenderer.invoke('pack:exportPayload', payload)
-  },
-
   runQuery(questionId: string, sql: string): Promise<QueryRunResult> {
     return ipcRenderer.invoke('practice:runQuery', { questionId, sql })
   },
 
-  runDemo(questionId: string, sql?: string): Promise<QueryRunResult> {
-    return ipcRenderer.invoke('practice:runDemo', { questionId, sql })
-  },
-
-  /** Classroom Demo: project SELECT against the built-in school dataset. */
-  runClassroomSql(sql: string): Promise<QueryRunResult> {
-    return ipcRenderer.invoke('demo:runClassroomSql', sql)
+  /** Run one linked-list exercise. Tests stay in the main process. */
+  runLinkedList(exerciseId: string, code: string): Promise<PythonRunResult> {
+    return ipcRenderer.invoke('python:runLinkedList', { exerciseId, code })
   }
 }
 

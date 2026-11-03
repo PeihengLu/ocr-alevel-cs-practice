@@ -1,34 +1,5 @@
-# Vendor binaries (packaging)
+# Vendor binaries
 
-Platform trees must not be mixed. Mac apps ship `vendor/mysql`; Windows Student ships `vendor/mysql-win`.
+SQL no longer ships a database server. Practice uses `sql.js` (SQLite compiled to WebAssembly), copied into the app as `sqlite/sql-wasm.wasm` at pack time.
 
-## macOS
-
-Regenerate a relocatable MySQL tree from Homebrew (dev machine only):
-
-```bash
-brew install mysql          # once
-npm run vendor:mysql       # → vendor/mysql/ (gitignored)
-```
-
-Packaged `.app` copies this into `Contents/Resources/mysql` via electron-builder `mac.extraResources`.
-
-## Windows (Student)
-
-Download official MariaDB **winx64** zip and stage a slim portable tree (includes `mysqld.exe` + `server.dll`):
-
-```bash
-npm run vendor:mysql:win   # → vendor/mysql-win/ (gitignored)
-```
-
-Cache: `vendor/.cache/mariadb-*-winx64.zip`.
-
-Then:
-
-```bash
-npm run dist:student:win   # → release/student-win/
-```
-
-Cross-build from macOS produces `win-unpacked/` (and a portable `.exe` when Wine is available). On a Windows machine the same script produces a double-click portable `.exe`.
-
-See `PACKAGING.md`.
+Python still ships the small Pyodide subset listed in `package.json` `extraResources`.

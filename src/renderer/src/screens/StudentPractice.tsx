@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
+import schoolBasicsSql from '../../../../samples/sql-basics/sql/school_basics.sql?raw'
+import { CodeEditor } from '../components/CodeEditor'
 import { ResultGrid } from '../components/ResultGrid'
-import { importPack } from '../pack'
+import { compareNumberedTitles } from '../../../shared/order'
+import { SQL_CHAPTERS, type SqlChapter } from '../../../shared/sql/chapters'
 import type {
   QueryRunResult,
   QuestionProgressStatus,
   QuestionSummary,
   StorageStatus
 } from '../pack'
+
+const BUILTIN_SCHEMAS: Record<string, string> = {
+  school_basics: schoolBasicsSql
+}
 
 type StatusFilter = 'all' | QuestionProgressStatus
 
@@ -27,34 +34,57 @@ export function StudentPractice(): ReactElement {
   const [summaries, setSummaries] = useState<QuestionSummary[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
-  const [flash, setFlash] = useState<string | null>(null)
   const [runResult, setRunResult] = useState<QueryRunResult | null>(null)
   const [busy, setBusy] = useState(false)
   const [filter, setFilter] = useState<StatusFilter>('all')
   const [focusMode, setFocusMode] = useState(false)
+  const [chapterId, setChapterId] = useState(SQL_CHAPTERS[0]?.id ?? '')
+  const [schemaText, setSchemaText] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const selected =
     summaries.find((s) => s.question.id === selectedId)?.question ?? null
   const selectedProgress =
     summaries.find((s) => s.question.id === selectedId)?.progress ?? null
 
+  const chapters = useMemo(() => chaptersFromSummaries(summaries), [summaries])
+  const chapter = chapters.find((item) => item.id === chapterId) ?? chapters[0] ?? null
+
   const visible = useMemo(() => {
-    if (filter === 'all') return summaries
-    return summaries.filter((s) => s.progress.status === filter)
-  }, [summaries, filter])
+    const inChapter = questionsForChapter(chapter, summaries)
+    if (filter === 'all') return inChapter
+    return inChapter.filter((item) => item.progress.status === filter)
+  }, [chapter, summaries, filter])
+
+  const schemaRef = chapter?.schemaRef ?? null
 
   const refresh = useCallback(async () => {
     const api = window.portableLeetcode
-    const [nextStatus, list] = await Promise.all([
-      api.getStorageStatus(),
-      api.listQuestionSummaries()
-    ])
-    setStatus(nextStatus)
-    setSummaries(list)
-    setSelectedId((prev) => {
-      if (prev && list.some((s) => s.question.id === prev)) return prev
-      return list[0]?.question.id ?? null
-    })
+    if (!api?.listQuestionSummaries || !api.getStorageStatus) {
+      setLoadError(
+        'This page cannot reach the question bank. Use the PortableLeetcode window.'
+      )
+      setLoaded(true)
+      return
+    }
+    try {
+      const [nextStatus, list] = await Promise.all([
+        api.getStorageStatus(),
+        api.listQuestionSummaries()
+      ])
+      setStatus(nextStatus)
+      setSummaries(list)
+      setLoadError(null)
+      setSelectedId((prev) => {
+        if (prev && list.some((s) => s.question.id === prev)) return prev
+        return list[0]?.question.id ?? null
+      })
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setLoaded(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -62,10 +92,44 @@ export function StudentPractice(): ReactElement {
   }, [refresh])
 
   useEffect(() => {
-    if (selected) setQuery(selected.starterQuery)
-    else setQuery('')
+    const question = summaries.find((item) => item.question.id === selectedId)?.question
+    setQuery(question ? question.starterQuery : '')
     setRunResult(null)
-  }, [selected])
+    // Reload the starter only when the student opens a different question.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId])
+
+  useEffect(() => {
+    if (!schemaRef) {
+      setSchemaText(null)
+      return
+    }
+    setSchemaText(BUILTIN_SCHEMAS[schemaRef] ?? null)
+    const api = window.portableLeetcode
+    if (!api?.getSqlAsset) return
+    let cancel = false
+    void api.getSqlAsset(schemaRef).then((sql) => {
+      if (!cancel && sql) setSchemaText(sql)
+    })
+    return () => {
+      cancel = true
+    }
+  }, [schemaRef])
+
+  useEffect(() => {
+    if (!selectedId) return
+    const owner = chapters.find((item) => item.questionIds.includes(selectedId))
+    if (owner) setChapterId(owner.id)
+  }, [selectedId, chapters])
+
+  function openChapter(nextChapterId: string): void {
+    const next = chapters.find((item) => item.id === nextChapterId)
+    if (!next) return
+    setChapterId(next.id)
+    if (selectedId && next.questionIds.includes(selectedId)) return
+    const first = questionsForChapter(next, summaries)[0]
+    if (first) setSelectedId(first.question.id)
+  }
 
   useEffect(() => {
     if (!focusMode) return
@@ -78,24 +142,6 @@ export function StudentPractice(): ReactElement {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [focusMode])
-
-  async function onImport(): Promise<void> {
-    setBusy(true)
-    setFlash(null)
-    try {
-      const result = await importPack()
-      if (!result.ok) {
-        setFlash(result.error)
-        return
-      }
-      setFlash(
-        `Imported “${result.pack.manifest.title}”: ${result.merged} merged, ${result.skipped} skipped, ${result.retired} retired (${result.storage}).`
-      )
-      await refresh()
-    } finally {
-      setBusy(false)
-    }
-  }
 
   async function onRun(): Promise<void> {
     if (!selected) return
@@ -111,54 +157,52 @@ export function StudentPractice(): ReactElement {
 
   return (
     <section className={focusMode ? 'shell practice-focus' : 'shell'}>
-      {!focusMode && (
-        <header className="shell-header">
-          <p className="eyebrow">Student</p>
-          <h1>Practice</h1>
-          <p className="lede">
-            Import a <code>.plpack</code>, open a question, and run a single{' '}
-            <code>SELECT</code>. Status badges show Not attempted / Attempted /
-            Passed (once passed, it stays passed).
-          </p>
-        </header>
-      )}
-
       {!focusMode && status && (
         <p className="status-line" role="status">
           Storage: <strong>{status.backend}</strong>
-          {status.mysqlConnected
-            ? ' · MySQL ready for Run Query'
-            : ' · MySQL offline (Run Query needs local MySQL)'}
+          {status.sqliteReady
+            ? ' · SQLite ready for Run Query'
+            : ' · SQLite failed to load'}
           {' — '}
           {status.message}
         </p>
       )}
-      {!focusMode && flash && (
-        <p className="flash" role="status">
-          {flash}
-        </p>
-      )}
-
       <div className={focusMode ? 'practice-grid focus-layout' : 'practice-grid'}>
         {!focusMode && (
           <>
             <article className="panel">
-              <h2>Packs</h2>
-              <p>
-                Try <code>samples/sql-basics.plpack</code> for absolute beginners.
-              </p>
-              <button
-                type="button"
-                className="btn"
-                disabled={busy}
-                onClick={() => void onImport()}
-              >
-                Import .plpack…
-              </button>
+              <h2>Chapters</h2>
+              <ul className="chapter-list">
+                {chapters.map((item) => {
+                  const open = item.id === chapter?.id
+                  const questions = questionsForChapter(item, summaries)
+                  const passed = questions.filter(
+                    (entry) => entry.progress.status === 'passed'
+                  ).length
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={open ? 'chapter-item active' : 'chapter-item'}
+                        aria-current={open ? 'true' : undefined}
+                        onClick={() => openChapter(item.id)}
+                      >
+                        <span className="chapter-item-row">
+                          <span className="q-title">{item.title}</span>
+                          <span className="chapter-count">
+                            {passed}/{questions.length || item.questionIds.length}
+                          </span>
+                        </span>
+                      </button>
+                      {open && <p className="chapter-summary">{item.summary}</p>}
+                    </li>
+                  )
+                })}
+              </ul>
             </article>
 
             <article className="panel question-list-panel">
-              <h2>Questions ({summaries.length})</h2>
+              <h2>Questions</h2>
               <div className="status-filter" role="group" aria-label="Filter by status">
                 {(
                   [
@@ -182,9 +226,13 @@ export function StudentPractice(): ReactElement {
               </div>
               {visible.length === 0 ? (
                 <p className="muted">
-                  {summaries.length === 0
-                    ? 'No questions yet — import a pack to start.'
-                    : 'No questions match this filter.'}
+                  {!loaded
+                    ? 'Loading questions…'
+                    : loadError
+                      ? loadError
+                      : summaries.length === 0
+                        ? 'No questions loaded. Restart the app if this build should include them.'
+                        : 'No questions in this chapter match this filter.'}
                 </p>
               ) : (
                 <ul className="question-list">
@@ -224,7 +272,10 @@ export function StudentPractice(): ReactElement {
           }
         >
           <div className="runner-toolbar">
-            <h2>{selected ? selected.title : 'Open a question'}</h2>
+            <div>
+              {chapter && <p className="eyebrow">{chapter.title}</p>}
+              <h2>{selected ? selected.title : 'Open a question'}</h2>
+            </div>
             <div className="btn-row toolbar-actions">
               {selectedProgress && (
                 <ProgressBadge status={selectedProgress.status} />
@@ -251,15 +302,21 @@ export function StudentPractice(): ReactElement {
             </div>
           </div>
 
+          {!focusMode && schemaText && (
+            <section className="schema-block" aria-label="Schema for this chapter">
+              <h3>Schema</h3>
+              <pre className="schema-view">{schemaText.trim()}</pre>
+            </section>
+          )}
+
           {selected ? (
             <>
               {!focusMode && (
                 <>
                   <p className="prompt">{selected.prompt}</p>
-                  <p className="muted tags">
-                    {selected.tags.join(' · ') || 'untagged'} · schema{' '}
-                    <code>{selected.schemaRef}</code>
-                  </p>
+                  {selected.tags.length > 0 && (
+                    <p className="muted tags">{selected.tags.join(' · ')}</p>
+                  )}
                 </>
               )}
               {focusMode && (
@@ -269,15 +326,15 @@ export function StudentPractice(): ReactElement {
                 </p>
               )}
               <label className="field-label" htmlFor="student-sql">
-                Your query (single SELECT only)
+                {queryLabel(selected)}
               </label>
-              <textarea
+              <CodeEditor
                 id="student-sql"
                 className={focusMode ? 'code-input focus-editor' : 'code-input'}
+                language="sql"
                 rows={focusMode ? 16 : 8}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                spellCheck={false}
+                onChange={setQuery}
               />
               <div className="btn-row">
                 <button
@@ -316,7 +373,11 @@ export function StudentPractice(): ReactElement {
                   )}
                   {runResult.result && (
                     <>
-                      <h3 className="result-heading">Result</h3>
+                      <h3 className="result-heading">
+                        {selected.statement
+                          ? 'Database after your statement'
+                          : 'Result'}
+                      </h3>
                       <ResultGrid result={runResult.result} />
                     </>
                   )}
@@ -330,6 +391,52 @@ export function StudentPractice(): ReactElement {
       </div>
     </section>
   )
+}
+
+function chaptersFromSummaries(summaries: QuestionSummary[]): SqlChapter[] {
+  const assigned = new Set(SQL_CHAPTERS.flatMap((chapter) => chapter.questionIds))
+  const extras = new Map<string, string[]>()
+  for (const item of summaries) {
+    if (assigned.has(item.question.id)) continue
+    const ids = extras.get(item.question.schemaRef) ?? []
+    ids.push(item.question.id)
+    extras.set(item.question.schemaRef, ids)
+  }
+  const extraChapters: SqlChapter[] = []
+  extras.forEach((questionIds, schemaRef) => {
+    extraChapters.push({
+      id: `other-${schemaRef}`,
+      title: 'Other questions',
+      summary: 'Questions that are not in a chapter yet.',
+      schemaRef,
+      questionIds
+    })
+  })
+  return [...SQL_CHAPTERS, ...extraChapters]
+}
+
+function questionsForChapter(
+  chapter: SqlChapter | null,
+  summaries: QuestionSummary[]
+): QuestionSummary[] {
+  if (!chapter) return []
+  const byId = new Map(summaries.map((item) => [item.question.id, item]))
+  const found = chapter.questionIds.flatMap((id) => {
+    const item = byId.get(id)
+    return item ? [item] : []
+  })
+  return [...found].sort((a, b) =>
+    compareNumberedTitles(a.question.title, b.question.title)
+  )
+}
+
+function queryLabel(question: {
+  statement?: 'insert' | 'delete' | 'drop'
+}): string {
+  if (question.statement === 'insert') return 'Your statement (single INSERT)'
+  if (question.statement === 'delete') return 'Your statement (single DELETE)'
+  if (question.statement === 'drop') return 'Your statement (single DROP TABLE)'
+  return 'Your query (single SELECT)'
 }
 
 function ProgressBadge({

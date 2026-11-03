@@ -118,6 +118,27 @@ function validateQuestion(raw: unknown, index: number): SqlQuestion {
       ? undefined
       : requireString(raw, 'solutionQuery')
 
+  const statement = raw.statement
+  if (
+    statement !== undefined &&
+    statement !== 'insert' &&
+    statement !== 'delete' &&
+    statement !== 'drop'
+  ) {
+    throw new Error(
+      `questions[${index}].statement must be insert, delete, or drop when present`
+    )
+  }
+
+  const effectQuery =
+    raw.effectQuery === undefined ? undefined : requireString(raw, 'effectQuery')
+  if (statement && !effectQuery) {
+    throw new Error(`questions[${index}] with statement requires effectQuery`)
+  }
+  if (effectQuery && !statement) {
+    throw new Error(`questions[${index}] effectQuery requires statement`)
+  }
+
   return {
     id,
     version,
@@ -125,6 +146,8 @@ function validateQuestion(raw: unknown, index: number): SqlQuestion {
     prompt: requireString(raw, 'prompt'),
     starterQuery: requireString(raw, 'starterQuery'),
     solutionQuery,
+    statement,
+    effectQuery,
     checks,
     tags,
     difficulty,

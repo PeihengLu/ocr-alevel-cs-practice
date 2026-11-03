@@ -7,7 +7,6 @@ export type {
   CheckOutcome,
   PackManifest,
   PackPayload,
-  PackExportResult,
   PackImportResult,
   ProgressRecord,
   QueryResultGrid,

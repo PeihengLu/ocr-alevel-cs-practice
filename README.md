@@ -1,137 +1,66 @@
 # PortableLeetcode
 
-Offline, plug-and-play coding practice for an A-level student. **Milestone 1** focuses on classroom SQL demos and student SQL practice — algorithms come after.
-
-One codebase. **Teacher** vs **Student** are different *build artifacts*, not forks (`EDITION` / `VITE_EDITION` only).
+Offline, plug-and-play coding practice for an A-level student. SQL practice and Python data-structure chapters ship in one app. Python runs in bundled Pyodide, so students do not install Python.
 
 ## Product model
 
 | Concern | Approach |
 | --- | --- |
-| Content updates | **Question packs** (`.plpack`) — teacher exports, student imports |
-| Editions | Same source; `VITE_EDITION=student\|teacher` at dev/build time |
-| Storage / practice | MySQL for bank + exercise sandbox; JSON bank fallback if MySQL is down |
-| **Shipped apps** | **Portable folder / `.app` / zip — no installer, no Docker, no Homebrew, no system MySQL** |
+| Content | Python chapters and SQL questions ship inside the app. A new build adds or updates them. Progress stays on each question id |
+| Storage / practice | SQLite for the question bank and each exercise; JSON bank fallback if SQLite cannot open |
+| **Shipped app** | **Portable folder / `.app` / zip. No installer and no database server** |
 | Platforms | macOS and Windows |
 
-### Pack format (`.plpack`)
+### SQL questions
 
-A `.plpack` is a zip:
+The SQL set lives in `samples/sql-basics/`. On launch the app merges that folder into the question bank.
 
-```
-manifest.json
-questions/<id>.json
-sql/<schemaRef>.sql
-```
+- A new question `id` is added.
+- A higher `version` on an existing `id` replaces the question. Progress stays.
+- An `id` in `retiredIds` is removed.
 
-- Stable question `id`s; higher `version` wins on import; `retiredIds` remove from bank.
-- `result_set` checks support `ordered: true` (ORDER BY) or unordered compare (default).
-
-| Pack | Path | Audience |
-| --- | --- | --- |
-| SQL Basics | `samples/sql-basics.plpack` | Absolute beginners (progressive, no JOINs) |
-| Intro SQL | `samples/intro-sql.plpack` | Tiny 2-question starter |
-
-Rebuild: `npm run sample:pack`.
+The statements to know by heart: SELECT (including a nested SELECT), FROM, WHERE, LIKE, AND, OR, JOIN, INSERT, DELETE, DROP, and the wildcards `*` and `%`.
 
 ## Packaging / portable ship
 
-**Students and classroom machines must not install anything.** Shipped builds are self-contained `.app` bundles (no installer, no Docker, no Homebrew).
+**The machine that runs the app must not install anything.** Shipped builds are self-contained `.app` bundles (no installer, no Docker, no Homebrew).
 
 ### Double-click (macOS arm64, built on this Mac)
 
-| Edition | Path |
-| --- | --- |
-| **Teacher** | `release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app` |
-| **Student** | `release/student-mac/mac-arm64/PortableLeetcode Student.app` |
+`release/mac-arm64/PortableLeetcode.app`
 
-Full Teacher path:
-
-`/Users/peiheng/development/portable-leetcode/release/teacher-mac/mac-arm64/PortableLeetcode Teacher.app`
-
-**Gatekeeper:** apps are unsigned. First open → right-click `.app` → **Open** → **Open**. Or `xattr -cr "…/PortableLeetcode Teacher.app"`.
-
-See also `release/HOW-TO-OPEN.md`.
+**Gatekeeper:** the app is unsigned. First open → right-click `.app` → **Open** → **Open**. Or `xattr -cr "…/PortableLeetcode.app"`.
 
 ### What the packaged app does
 
-1. Bundles portable MySQL under `Contents/Resources/mysql` (staged via `npm run vendor:mysql` from Homebrew on the *build* Mac only).
-2. On launch, `ensureMysqlSidecar()` starts `mysqld` on **`127.0.0.1:13306`** with `--datadir` in `~/Library/Application Support/portable-leetcode/mysql-data`.
-3. On quit, `stopMysqlSidecar()` shuts it down.
-4. Sample packs ship in `Contents/Resources/samples/*.plpack`.
+1. SQL runs in bundled SQLite (`sql.js`). Each Run Query gets a fresh in-memory database seeded from the question schema.
+2. Progress is stored in `portable-leetcode.sqlite` in the app's user-data folder, with a JSON copy beside it.
+3. SQL questions ship in `Contents/Resources/samples/sql-basics` (Mac) or `resources/samples/sql-basics` (Windows) and are merged into the bank on launch.
 
-### Rebuild packs (dev machine with Homebrew MySQL)
-
-```bash
-npm run pack:mac:teacher   # → release/teacher-mac/…
-npm run pack:mac:student   # → release/student-mac/…
-npm run dist:student:win   # → release/student-win/ (MariaDB winx64 bundled)
-```
-
-### Windows Student
+### Rebuild
 
 ```bash
-npm run vendor:mysql:win   # official MariaDB winx64 → vendor/mysql-win
-npm run dist:student:win   # portable .exe + win-unpacked/
+npm run pack:mac   # → release/mac-arm64/PortableLeetcode.app
+npm run dist:win   # → release/PortableLeetcode-0.1.0-portable.exe and win-unpacked/
 ```
-
-Artifacts (no Docker/Homebrew on the student PC):
-
-- `release/student-win/PortableLeetcode Student-0.1.0-portable.exe`
-- `release/student-win/win-unpacked/PortableLeetcode Student.exe`
 
 See `PACKAGING.md`.
 
-## Dev MySQL on this Mac (Homebrew — not for students)
-
-Docker Desktop is broken here; use Homebrew for **development only**:
-
 ```bash
-brew install mysql          # or: brew install mariadb
-brew services start mysql   # or: brew services start mariadb
-
-# Create app DB + user + exercise sandbox (once)
-chmod +x scripts/setup-local-mysql.sh
-./scripts/setup-local-mysql.sh
-
-# If root needs a password:
-# MYSQL_ROOT_PASSWORD='…' ./scripts/setup-local-mysql.sh
-```
-
-Defaults (`.env.example` / `src/main/db/config.ts`):
-
-| Variable | Default |
-| --- | --- |
-| `MYSQL_HOST` | `127.0.0.1` |
-| `MYSQL_PORT` | `3306` (dev) / **`13306`** (packaged / `MYSQL_PREFER_BUNDLED`) |
-| `MYSQL_USER` | `portable` |
-| `MYSQL_PASSWORD` | `portable` |
-| `MYSQL_DATABASE` | `portable_leetcode` |
-| `MYSQL_DATA_DIR` | `<userData>/mysql-data` |
-
-Exercise sandbox DB: `pl_exercise` (created by the setup script / `sql/000_exercise_db.sql`).
-
-**Optional / secondary:** `docker-compose.yml` exists for developers who have working Docker — not the recommended path on this Mac, and never a student dependency.
-
-```bash
-# Force JSON-only bank (Run Query will error clearly without MySQL)
+# Force JSON-only bank. Run Query still uses SQLite when the wasm loaded.
 export PORTABLE_LEETCODE_STORAGE=json
 ```
 
 ### Run Query safety
 
-- Single `SELECT` / `WITH … SELECT` only (multi-statement + DDL/DML rejected)
-- Seed applied into isolated `pl_exercise`; student query uses `multipleStatements: false` + read-only transaction
+- SELECT questions: a single `SELECT` / `WITH … SELECT`
+- INSERT, DELETE, and DROP TABLE questions: one write on a freshly seeded database, then a check query
 
 ## Run (dev)
 
 ```bash
 npm install
-npm run sample:pack
-./scripts/setup-local-mysql.sh   # once, after brew MySQL is running
-
-npm run dev:student   # Import samples/sql-basics.plpack → Run query
-npm run dev:teacher   # Author / Demo → Load solution → Run for class
+npm run dev   # Practice opens on the Python chapters; SQL is the other tab
 
 npm run typecheck
 npm run test:practice
@@ -139,30 +68,27 @@ npm run test:practice
 
 ### What to try — Run Query
 
-1. `brew services start mysql` + `./scripts/setup-local-mysql.sh`
-2. `npm run dev:student`
-3. Practice → **Import .plpack…** → `samples/sql-basics.plpack`
-4. Open **1. Select every column**, finish the query, **Run query**
-5. Confirm pass/fail + result grid
+1. `npm run dev`
+2. Practice → **SQL**
+3. Open `1. SELECT *`, finish the query, **Run query**
+4. Confirm pass/fail + result grid
 
 ## Build
 
 ```bash
-npm run build:student
-npm run build:teacher
-npm run pack:mac:teacher   # Mac Teacher .app + bundled mysqld
-npm run pack:mac:student   # Mac Student .app
-npm run dist:student:win   # Windows Student portable + MariaDB winx64
+npm run deploy     # Mac .app zip and Windows zip together → release/deploy/
+npm run pack:mac   # Mac only
+npm run dist:win   # Windows only
 ```
 
 ## Project layout
 
 ```
-sql/                      # App schema + exercise DB grants
-samples/sql-basics/       # Beginner pack
-src/main/db/              # Config + portable mysqld lifecycle hooks
+sql/                      # SQLite question-bank schema
+samples/sql-basics/       # SQL questions merged on launch
+src/main/db/              # SQLite engine, schema migrate, file paths
 src/main/practice/        # Sanitize, compare, exercise runner
-src/main/pack/            # .plpack zip I/O
-src/main/store/           # Question bank (MySQL + JSON fallback)
-src/renderer/src/screens/ # Practice / Author / Demo
+src/main/content/         # Reads the built-in SQL catalog
+src/main/store/           # Question bank (SQLite + JSON fallback)
+src/renderer/src/screens/ # Practice (Python and SQL)
 ```

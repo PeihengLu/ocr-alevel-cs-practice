@@ -86,6 +86,9 @@ export type QueryRunResult =
       checks?: CheckOutcome[]
     }
 
+/** Write practised on a freshly seeded exercise database, then graded via effectQuery. */
+export type SqlWriteStatement = 'insert' | 'delete' | 'drop'
+
 export interface SqlQuestion {
   id: string
   /** Monotonic per-question version; higher wins on merge. */
@@ -94,6 +97,13 @@ export interface SqlQuestion {
   prompt: string
   starterQuery: string
   solutionQuery?: string
+  /**
+   * When set, the student submits one INSERT, DELETE, or DROP TABLE.
+   * effectQuery (a SELECT) runs afterwards and its grid is what `checks` grade.
+   * Omit both for a read-only SELECT question.
+   */
+  statement?: SqlWriteStatement
+  effectQuery?: string
   checks: SqlCheck[]
   tags: string[]
   difficulty: 'easy' | 'medium' | 'hard'
@@ -119,16 +129,11 @@ export type PackImportResult =
     }
   | { ok: false; error: string }
 
-export type PackExportResult =
-  | { ok: true; path: string }
-  | { ok: false; error: string; cancelled?: boolean }
-
-export type StorageBackend = 'mysql' | 'json'
+export type StorageBackend = 'sqlite' | 'json'
 
 export interface StorageStatus {
   backend: StorageBackend
-  mysqlConfigured: boolean
-  mysqlConnected: boolean
+  sqliteReady: boolean
   message: string
   questionCount: number
 }

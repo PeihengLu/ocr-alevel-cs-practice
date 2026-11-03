@@ -1,15 +1,5 @@
 /// <reference types="vite/client" />
 
-type Edition = 'student' | 'teacher'
-
-interface ImportMetaEnv {
-  readonly VITE_EDITION: Edition
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
-
 interface SqlCheckResultSet {
   type: 'result_set'
   expected: Record<string, unknown>[]
@@ -34,7 +24,8 @@ interface SqlQuestion {
   title: string
   prompt: string
   starterQuery: string
-  solutionQuery?: string
+  statement?: 'insert' | 'delete' | 'drop'
+  effectQuery?: string
   checks: SqlCheck[]
   tags: string[]
   difficulty: 'easy' | 'medium' | 'hard'
@@ -67,18 +58,13 @@ type PackImportResult =
       merged: number
       skipped: number
       retired: number
-      storage: 'mysql' | 'json'
+      storage: 'sqlite' | 'json'
     }
   | { ok: false; error: string }
 
-type PackExportResult =
-  | { ok: true; path: string }
-  | { ok: false; error: string; cancelled?: boolean }
-
 interface StorageStatus {
-  backend: 'mysql' | 'json'
-  mysqlConfigured: boolean
-  mysqlConnected: boolean
+  backend: 'sqlite' | 'json'
+  sqliteReady: boolean
   message: string
   questionCount: number
 }
@@ -132,32 +118,29 @@ type QueryRunResult =
 
 interface PortableLeetcodeBridge {
   platform: NodeJS.Platform
-  editions: readonly Edition[]
   getStorageStatus(): Promise<StorageStatus>
   listQuestions(): Promise<SqlQuestion[]>
   listQuestionSummaries(): Promise<QuestionSummary[]>
   getQuestion(id: string): Promise<SqlQuestion | null>
   getSqlAsset(schemaRef: string): Promise<string | null>
-  upsertQuestion(
-    question: SqlQuestion,
-    sqlAsset?: string
-  ): Promise<{ ok: true } | { ok: false; error: string }>
   importPack(): Promise<PackImportResult>
   importPackPath(filePath: string): Promise<PackImportResult>
-  exportPack(args: {
-    meta: {
-      packId: string
-      version: string
-      title: string
-      description?: string
-      retiredIds?: string[]
-    }
-    questionIds: string[]
-  }): Promise<PackExportResult>
-  exportPackPayload(payload: PackPayload): Promise<PackExportResult>
   runQuery(questionId: string, sql: string): Promise<QueryRunResult>
-  runDemo(questionId: string, sql?: string): Promise<QueryRunResult>
-  runClassroomSql(sql: string): Promise<QueryRunResult>
+  runLinkedList(exerciseId: string, code: string): Promise<PythonRunResult>
+}
+
+interface PythonCheck {
+  name: string
+  passed: boolean
+  detail: string
+}
+
+interface PythonRunResult {
+  passed: boolean
+  message: string
+  checks: PythonCheck[]
+  output: string
+  error?: string
 }
 
 interface Window {
