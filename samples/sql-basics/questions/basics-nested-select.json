@@ -1,0 +1,21 @@
+{
+  "id": "basics-nested-select",
+  "version": 1,
+  "title": "7. Nested SELECT",
+  "prompt": "A nested SELECT is a query inside another query. The inner query runs first.\n\nhouses.name matches students.house.\n\nReturn name and house for students whose house is the one headed by Ms Khan. Use a nested SELECT to find that house name.\n\n(Order does not matter.)",
+  "starterQuery": "SELECT name, house\nFROM students\nWHERE house = (\n  SELECT \n);",
+  "solutionQuery": "SELECT name, house FROM students WHERE house = (SELECT name FROM houses WHERE head = 'Ms Khan');",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina", "house": "Red" },
+        { "name": "Dev", "house": "Red" }
+      ]
+    }
+  ],
+  "tags": ["select", "nested"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

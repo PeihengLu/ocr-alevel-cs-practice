@@ -1,0 +1,21 @@
+{
+  "id": "basics-where-and",
+  "version": 1,
+  "title": "4. WHERE with AND",
+  "prompt": "AND means both conditions must be true.\n\nReturn name and house for students who are in year 12 and in the Red house.\n\n(Order does not matter.)",
+  "starterQuery": "SELECT name, house\nFROM students\nWHERE ",
+  "solutionQuery": "SELECT name, house FROM students WHERE year_group = 12 AND house = 'Red';",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina", "house": "Red" },
+        { "name": "Dev", "house": "Red" }
+      ]
+    }
+  ],
+  "tags": ["where", "and"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

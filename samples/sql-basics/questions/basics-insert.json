@@ -1,0 +1,28 @@
+{
+  "id": "basics-insert",
+  "version": 1,
+  "title": "9. INSERT a row",
+  "prompt": "INSERT adds a row.\n\nAdd this student:\n\nid 7, name Grace, year_group 11, house Yellow, maths_score 80\n\nThe check runs after your statement and looks at the whole students table.",
+  "starterQuery": "INSERT INTO students (id, name, year_group, house, maths_score)\nVALUES ",
+  "solutionQuery": "INSERT INTO students (id, name, year_group, house, maths_score) VALUES (7, 'Grace', 11, 'Yellow', 80);",
+  "statement": "insert",
+  "effectQuery": "SELECT id, name, year_group, house, maths_score FROM students",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "id": 1, "name": "Amina", "year_group": 12, "house": "Red", "maths_score": 78 },
+        { "id": 2, "name": "Ben", "year_group": 13, "house": "Blue", "maths_score": 64 },
+        { "id": 3, "name": "Cara", "year_group": 12, "house": "Green", "maths_score": 91 },
+        { "id": 4, "name": "Dev", "year_group": 12, "house": "Red", "maths_score": 55 },
+        { "id": 5, "name": "Elena", "year_group": 13, "house": "Blue", "maths_score": 88 },
+        { "id": 6, "name": "Farah", "year_group": 11, "house": "Green", "maths_score": 72 },
+        { "id": 7, "name": "Grace", "year_group": 11, "house": "Yellow", "maths_score": 80 }
+      ]
+    }
+  ],
+  "tags": ["insert"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

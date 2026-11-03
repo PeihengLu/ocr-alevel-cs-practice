@@ -1,0 +1,26 @@
+{
+  "id": "basics-delete",
+  "version": 1,
+  "title": "10. DELETE rows",
+  "prompt": "DELETE removes rows that match WHERE. Without WHERE it would remove every row.\n\nRemove the student named Dev.\n\nThe check runs after your statement and lists the names still in students.",
+  "starterQuery": "DELETE FROM students\nWHERE ",
+  "solutionQuery": "DELETE FROM students WHERE name = 'Dev';",
+  "statement": "delete",
+  "effectQuery": "SELECT name FROM students",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina" },
+        { "name": "Ben" },
+        { "name": "Cara" },
+        { "name": "Elena" },
+        { "name": "Farah" }
+      ]
+    }
+  ],
+  "tags": ["delete"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

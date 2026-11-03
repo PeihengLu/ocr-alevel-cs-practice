@@ -1,0 +1,22 @@
+{
+  "id": "basics-like",
+  "version": 1,
+  "title": "6. LIKE and %",
+  "prompt": "LIKE matches a text pattern. The % wildcard means any characters.\n\nReturn name for students whose name ends with a. The pattern is '%a'.\n\n(Order does not matter.)",
+  "starterQuery": "SELECT name\nFROM students\nWHERE name LIKE ",
+  "solutionQuery": "SELECT name FROM students WHERE name LIKE '%a';",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina" },
+        { "name": "Cara" },
+        { "name": "Elena" }
+      ]
+    }
+  ],
+  "tags": ["where", "like", "wildcard"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

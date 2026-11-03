@@ -1,8 +1,8 @@
 {
   "id": "basics-select-all",
-  "version": 1,
-  "title": "1. Select every column",
-  "prompt": "The school keeps a table called `students`.\n\nWrite a query that returns **every row** and **every column** from `students`.\n\nHint: use `SELECT *`.",
+  "version": 3,
+  "title": "1. SELECT *",
+  "prompt": "Tables:\n\nstudents (id, name, year_group, house, maths_score)\nhouses (name, head, colour)\n\nThe * wildcard means every column.\n\nReturn every row and every column from students.",
   "starterQuery": "SELECT ",
   "solutionQuery": "SELECT * FROM students;",
   "checks": [
@@ -12,7 +12,7 @@
       "expected": ["id", "name", "year_group", "house", "maths_score"]
     }
   ],
-  "tags": ["select", "basics"],
+  "tags": ["select", "wildcard"],
   "difficulty": "easy",
   "schemaRef": "school_basics"
 }

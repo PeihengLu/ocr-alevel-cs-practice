@@ -1,0 +1,25 @@
+{
+  "id": "basics-join",
+  "version": 1,
+  "title": "8. JOIN (inner join)",
+  "prompt": "JOIN means an inner join: only rows that match in both tables.\n\nReturn students.name and houses.head, matching students.house to houses.name.\n\nYellow (head Ms Patel) has no students, so that house must not appear.\n\n(Order does not matter.)",
+  "starterQuery": "SELECT students.name, houses.head\nFROM students\nJOIN houses ON ",
+  "solutionQuery": "SELECT students.name, houses.head FROM students JOIN houses ON students.house = houses.name;",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "name": "Amina", "head": "Ms Khan" },
+        { "name": "Ben", "head": "Mr Adeyemi" },
+        { "name": "Cara", "head": "Dr Okonkwo" },
+        { "name": "Dev", "head": "Ms Khan" },
+        { "name": "Elena", "head": "Mr Adeyemi" },
+        { "name": "Farah", "head": "Dr Okonkwo" }
+      ]
+    }
+  ],
+  "tags": ["join"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

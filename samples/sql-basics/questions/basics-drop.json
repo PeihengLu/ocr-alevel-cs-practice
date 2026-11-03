@@ -1,0 +1,22 @@
+{
+  "id": "basics-drop",
+  "version": 2,
+  "title": "11. DROP a table",
+  "prompt": "DROP TABLE removes a whole table, not just its rows.\n\nRemove the houses table. Leave students in place.\n\nThe check runs afterwards: houses_left should be 0 and students_left should be 1.",
+  "starterQuery": "DROP TABLE ",
+  "solutionQuery": "DROP TABLE houses;",
+  "statement": "drop",
+  "effectQuery": "SELECT COALESCE(SUM(CASE WHEN LOWER(name) = 'houses' THEN 1 ELSE 0 END), 0) AS houses_left, COALESCE(SUM(CASE WHEN LOWER(name) = 'students' THEN 1 ELSE 0 END), 0) AS students_left FROM sqlite_schema WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+  "checks": [
+    {
+      "type": "result_set",
+      "ordered": false,
+      "expected": [
+        { "houses_left": 0, "students_left": 1 }
+      ]
+    }
+  ],
+  "tags": ["drop"],
+  "difficulty": "easy",
+  "schemaRef": "school_basics"
+}

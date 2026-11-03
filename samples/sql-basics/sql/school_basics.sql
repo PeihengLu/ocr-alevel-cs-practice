@@ -1,4 +1,4 @@
--- Tiny school roster for absolute beginners (no JOINs).
+-- School dataset for the SQL exercises.
 CREATE TABLE students (
   id INT PRIMARY KEY,
   name VARCHAR(64) NOT NULL,
@@ -14,3 +14,15 @@ INSERT INTO students (id, name, year_group, house, maths_score) VALUES
   (4, 'Dev', 12, 'Red', 55),
   (5, 'Elena', 13, 'Blue', 88),
   (6, 'Farah', 11, 'Green', 72);
+
+CREATE TABLE houses (
+  name VARCHAR(32) PRIMARY KEY,
+  head VARCHAR(64) NOT NULL,
+  colour VARCHAR(32) NOT NULL
+);
+
+INSERT INTO houses (name, head, colour) VALUES
+  ('Red', 'Ms Khan', 'Crimson'),
+  ('Blue', 'Mr Adeyemi', 'Navy'),
+  ('Green', 'Dr Okonkwo', 'Emerald'),
+  ('Yellow', 'Ms Patel', 'Gold');
