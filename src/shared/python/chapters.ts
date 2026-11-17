@@ -1,4 +1,6 @@
+import { GRAPH_EXERCISES } from './graphs.ts'
 import { LINKED_LIST_EXERCISES, type PythonExercise } from './linkedList.ts'
+import { QUEUE_EXERCISES } from './queues.ts'
 import {
   DECIDE_EXERCISES,
   FACT_EXERCISES,
@@ -8,6 +10,8 @@ import {
   UNTIL_EXERCISES,
   WALK_EXERCISES
 } from './solving.ts'
+import { STACK_EXERCISES } from './stacks.ts'
+import { TREE_EXERCISES } from './trees.ts'
 
 export type { PythonExercise }
 
@@ -87,6 +91,38 @@ export const PYTHON_CHAPTERS: PythonChapter[] = [
     summary:
       'A node holds a value and a link. Build the list class, then insert, search, delete, and count by walking those links.',
     exercises: LINKED_LIST_EXERCISES
+  },
+  {
+    id: 'stacks',
+    title: 'Stacks',
+    track: 'structures',
+    summary:
+      'A stack adds and removes at the top only. Build an array stack, then use push and pop to reverse a sequence.',
+    exercises: STACK_EXERCISES
+  },
+  {
+    id: 'queues',
+    title: 'Queues',
+    track: 'structures',
+    summary:
+      'A queue adds at the rear and removes at the front. Implement linear, circular, and linked-list forms.',
+    exercises: QUEUE_EXERCISES
+  },
+  {
+    id: 'trees',
+    title: 'Trees',
+    track: 'structures',
+    summary:
+      'Build a binary tree, traverse it in pre-order, in-order, post-order and breadth-first, then search, insert and delete in a BST.',
+    exercises: TREE_EXERCISES
+  },
+  {
+    id: 'graphs',
+    title: 'Graphs',
+    track: 'structures',
+    summary:
+      'Store a graph as an adjacency list, add and remove edges and vertices, then traverse with BFS and DFS.',
+    exercises: GRAPH_EXERCISES
   }
 ]
 

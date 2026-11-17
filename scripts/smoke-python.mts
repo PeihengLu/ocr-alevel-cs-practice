@@ -6,14 +6,22 @@ import assert from 'node:assert/strict'
 import { join } from 'node:path'
 import { PythonSession } from '../src/main/python/session.ts'
 import { findPythonExercise, PYTHON_CHAPTERS } from '../src/shared/python/chapters.ts'
+import { GRAPH_SOLUTIONS } from '../src/shared/python/graphs.solutions.ts'
 import { LINKED_LIST_EXERCISES } from '../src/shared/python/linkedList.ts'
 import { LINKED_LIST_SOLUTIONS } from '../src/shared/python/linkedList.solutions.ts'
+import { QUEUE_SOLUTIONS } from '../src/shared/python/queues.solutions.ts'
 import { SOLVING_SOLUTIONS } from '../src/shared/python/solving.solutions.ts'
+import { STACK_SOLUTIONS } from '../src/shared/python/stacks.solutions.ts'
+import { TREE_SOLUTIONS } from '../src/shared/python/trees.solutions.ts'
 import { buildPythonProgram, gradePythonRun } from '../src/shared/python/report.ts'
 
 const SOLUTIONS: Record<string, string> = {
   ...SOLVING_SOLUTIONS,
-  ...LINKED_LIST_SOLUTIONS
+  ...LINKED_LIST_SOLUTIONS,
+  ...STACK_SOLUTIONS,
+  ...QUEUE_SOLUTIONS,
+  ...TREE_SOLUTIONS,
+  ...GRAPH_SOLUTIONS
 }
 
 const session = new PythonSession({
