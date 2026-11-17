@@ -1,5 +1,6 @@
 import { GRAPH_EXERCISES } from './graphs.ts'
 import { LINKED_LIST_EXERCISES, type PythonExercise } from './linkedList.ts'
+import { PAST_PAPER_CHAPTERS } from './pastPapers.ts'
 import { QUEUE_EXERCISES } from './queues.ts'
 import {
   DECIDE_EXERCISES,
@@ -15,8 +16,8 @@ import { TREE_EXERCISES } from './trees.ts'
 
 export type { PythonExercise }
 
-/** Basics and data structures share one progress store. The track only chooses which chapters a panel shows. */
-export type PythonTrack = 'basics' | 'structures'
+/** Basics, data structures, and past papers share one progress store. The track only chooses which chapters a panel shows. */
+export type PythonTrack = 'basics' | 'structures' | 'past-papers'
 
 export interface PythonChapter {
   id: string
@@ -123,7 +124,14 @@ export const PYTHON_CHAPTERS: PythonChapter[] = [
     summary:
       'Store a graph as an adjacency list, add and remove edges and vertices, then traverse with BFS and DFS.',
     exercises: GRAPH_EXERCISES
-  }
+  },
+  ...PAST_PAPER_CHAPTERS.map((chapter) => ({
+    id: chapter.id,
+    title: chapter.title,
+    summary: chapter.summary,
+    track: 'past-papers' as const,
+    exercises: chapter.exercises
+  }))
 ]
 
 export function chaptersForTrack(track: PythonTrack): PythonChapter[] {

@@ -8,6 +8,7 @@ type PracticeArea = PythonTrack | 'sql'
 const AREAS: { id: PracticeArea; label: string }[] = [
   { id: 'basics', label: 'Programming Basics' },
   { id: 'structures', label: 'Data Structures' },
+  { id: 'past-papers', label: 'Past Papers' },
   { id: 'sql', label: 'SQL' }
 ]
 

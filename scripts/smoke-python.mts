@@ -9,6 +9,7 @@ import { findPythonExercise, PYTHON_CHAPTERS } from '../src/shared/python/chapte
 import { GRAPH_SOLUTIONS } from '../src/shared/python/graphs.solutions.ts'
 import { LINKED_LIST_EXERCISES } from '../src/shared/python/linkedList.ts'
 import { LINKED_LIST_SOLUTIONS } from '../src/shared/python/linkedList.solutions.ts'
+import { PAST_PAPER_SOLUTIONS } from '../src/shared/python/pastPapers.solutions.ts'
 import { QUEUE_SOLUTIONS } from '../src/shared/python/queues.solutions.ts'
 import { SOLVING_SOLUTIONS } from '../src/shared/python/solving.solutions.ts'
 import { STACK_SOLUTIONS } from '../src/shared/python/stacks.solutions.ts'
@@ -21,7 +22,8 @@ const SOLUTIONS: Record<string, string> = {
   ...STACK_SOLUTIONS,
   ...QUEUE_SOLUTIONS,
   ...TREE_SOLUTIONS,
-  ...GRAPH_SOLUTIONS
+  ...GRAPH_SOLUTIONS,
+  ...PAST_PAPER_SOLUTIONS
 }
 
 const session = new PythonSession({

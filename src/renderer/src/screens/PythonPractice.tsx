@@ -158,8 +158,9 @@ export function PythonPractice({ track }: { track: PythonTrack }): ReactElement 
     <section className="shell">
       <header className="shell-header">
         <p className="lede">
-          Work through one chapter at a time. Each chapter is a short set of
-          exercises on one idea. Python runs inside the app.
+          {track === 'past-papers'
+            ? 'Past papers are grouped as chapters — one paper per chapter, with original practice prompts that train the same coding skills. Python runs inside the app.'
+            : 'Work through one chapter at a time. Each chapter is a short set of exercises on one idea. Python runs inside the app.'}
         </p>
       </header>
 
