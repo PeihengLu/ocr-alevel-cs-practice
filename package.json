@@ -1,6 +1,6 @@
 {
   "name": "portable-leetcode",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Offline plug-and-play coding practice for SQL and Python",
   "main": "./out/main/index.js",
   "author": "PeihengLu",
@@ -17,12 +17,18 @@
     "pack:win": "npm run sample:pack && npm run build && electron-builder --win dir portable --x64",
     "dist:win": "npm run pack:win",
     "deploy": "node scripts/deploy.mjs",
-    "pack:dir": "electron-builder --dir"
+    "pack:dir": "electron-builder --dir",
+    "tauri:vite": "vite --config vite.config.tauri.ts",
+    "tauri:vite:build": "vite build --config vite.config.tauri.ts",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@codemirror/lang-python": "^6.2.1",
     "@codemirror/lang-sql": "^6.10.0",
     "@codemirror/language": "^6.13.1",
+    "@tauri-apps/api": "^2.12.5",
+    "@tauri-apps/plugin-dialog": "^2.8.4",
     "codemirror": "^6.0.2",
     "jszip": "^3.10.2",
     "pyodide": "^314.0.7",
@@ -31,6 +37,7 @@
     "sql.js": "^1.15.2"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.5",
     "@types/jszip": "^3.4.0",
     "@types/node": "^24.7.2",
     "@types/react": "^19.2.2",

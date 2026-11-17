@@ -60,7 +60,11 @@ export PORTABLE_LEETCODE_STORAGE=json
 
 ```bash
 npm install
-npm run dev   # Practice opens on the Python chapters; SQL is the other tab
+npm run dev   # Electron — Practice opens on the Python chapters; SQL is the other tab
+
+# Tauri 2 shell (smaller download; same UI). Needs Rust (`rustup`).
+npm run tauri:dev
+npm run tauri:build   # → src-tauri/target/release/bundle/macos/PortableLeetcode.app
 
 npm run typecheck
 npm run test:practice

@@ -1,0 +1,46 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "PortableLeetcode",
+  "version": "0.4.0",
+  "identifier": "com.portableleetcode.desktop",
+  "build": {
+    "frontendDist": "../dist-tauri",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run tauri:vite",
+    "beforeBuildCommand": "npm run tauri:vite:build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "PortableLeetcode",
+        "width": 1100,
+        "height": 720,
+        "minWidth": 800,
+        "minHeight": 560,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; worker-src 'self' blob:; connect-src 'self' ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "../sql/001_app_schema.sql": "sql/001_app_schema.sql",
+      "../samples/sql-basics": "samples/sql-basics"
+    },
+    "macOS": {
+      "hardenedRuntime": false
+    }
+  }
+}

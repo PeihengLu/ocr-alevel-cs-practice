@@ -21,6 +21,15 @@ Progress is a SQLite file, `portable-leetcode.sqlite`, in the app's user-data fo
 
 Build with `npm run pack:mac`, or both platforms with `npm run deploy`. Electron ships its English locale pack only.
 
+### Tauri (optional smaller shell)
+
+```bash
+npm run tauri:dev
+npm run tauri:build
+```
+
+Mac app lands under `src-tauri/target/release/bundle/macos/PortableLeetcode.app` (about 21 MB with bundled Pyodide). Electron `npm run deploy` stays the primary ship path until Tauri is fully verified.
+
 ## Windows (portable)
 
 | Artifact | Path |

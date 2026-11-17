@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Build the Mac app and the Windows app in one go, then zip both into release/deploy.
+ * Build Electron (Mac + Windows) and the Tauri Mac app, then zip artifacts into release/deploy.
  *
  *   npm run deploy
  *
  * SQL runs in bundled SQLite, so neither platform needs a database server.
  * The portable Windows .exe needs Wine when this runs on a Mac; the unpacked folder is
- * always produced and zipped.
+ * always produced and zipped. Tauri Windows is not cross-built from macOS.
  */
 import { spawnSync } from 'node:child_process'
 import {
@@ -140,6 +140,40 @@ for (const name of readdirSync(winRoot)) {
   const to = join(deployDir, `PortableLeetcode-${version}-windows-x64-portable.exe`)
   cpSync(from, to)
   made.push(to)
+}
+
+if (isMac) {
+  console.log('\nPacking Tauri macOS…')
+  const tauriOk = tryRun('npm', ['run', 'tauri:build'])
+  if (!tauriOk) {
+    console.error('\nTauri build failed. Electron zips are still in release/deploy.')
+    process.exit(1)
+  }
+
+  const cargoTarget =
+    process.env.CARGO_TARGET_DIR ||
+    join(root, 'src-tauri', 'target')
+  const tauriApps = [
+    ...findDirs(join(cargoTarget, 'release', 'bundle', 'macos'), '.app'),
+    ...findDirs(join(root, 'release', 'tauri-mac-arm64'), '.app')
+  ]
+  if (tauriApps.length === 0) {
+    console.error('Tauri build finished without a .app under the cargo bundle path.')
+    process.exit(1)
+  }
+  const tauriApp = tauriApps[0]
+  const tauriArch = process.arch === 'arm64' ? 'arm64' : 'x64'
+  const tauriZip = join(
+    deployDir,
+    `PortableLeetcode-${version}-tauri-mac-${tauriArch}.zip`
+  )
+  zipKeepingParent(tauriApp, tauriZip)
+  made.push(tauriZip)
+
+  const stageDir = join(root, 'release', `tauri-mac-${tauriArch}`)
+  rmSync(stageDir, { recursive: true, force: true })
+  mkdirSync(stageDir, { recursive: true })
+  cpSync(tauriApp, join(stageDir, 'PortableLeetcode.app'), { recursive: true })
 }
 
 console.log('\nReady to hand over:')

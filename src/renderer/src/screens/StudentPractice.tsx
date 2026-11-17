@@ -4,6 +4,7 @@ import { CodeEditor } from '../components/CodeEditor'
 import { ResultGrid } from '../components/ResultGrid'
 import { compareNumberedTitles } from '../../../shared/order'
 import { SQL_CHAPTERS, type SqlChapter } from '../../../shared/sql/chapters'
+import { getPortableLeetcode } from '../bridge'
 import type {
   QueryRunResult,
   QuestionProgressStatus,
@@ -60,15 +61,15 @@ export function StudentPractice(): ReactElement {
   const schemaRef = chapter?.schemaRef ?? null
 
   const refresh = useCallback(async () => {
-    const api = window.portableLeetcode
-    if (!api?.listQuestionSummaries || !api.getStorageStatus) {
-      setLoadError(
-        'This page cannot reach the question bank. Use the PortableLeetcode window.'
-      )
-      setLoaded(true)
-      return
-    }
     try {
+      const api = await getPortableLeetcode()
+      if (!api?.listQuestionSummaries || !api.getStorageStatus) {
+        setLoadError(
+          'This page cannot reach the question bank. Use the PortableLeetcode window.'
+        )
+        setLoaded(true)
+        return
+      }
       const [nextStatus, list] = await Promise.all([
         api.getStorageStatus(),
         api.listQuestionSummaries()
@@ -105,11 +106,12 @@ export function StudentPractice(): ReactElement {
       return
     }
     setSchemaText(BUILTIN_SCHEMAS[schemaRef] ?? null)
-    const api = window.portableLeetcode
-    if (!api?.getSqlAsset) return
     let cancel = false
-    void api.getSqlAsset(schemaRef).then((sql) => {
-      if (!cancel && sql) setSchemaText(sql)
+    void getPortableLeetcode().then((api) => {
+      if (!api?.getSqlAsset) return
+      return api.getSqlAsset(schemaRef).then((sql) => {
+        if (!cancel && sql) setSchemaText(sql)
+      })
     })
     return () => {
       cancel = true
@@ -147,7 +149,8 @@ export function StudentPractice(): ReactElement {
     if (!selected) return
     setBusy(true)
     try {
-      const result = await window.portableLeetcode.runQuery(selected.id, query)
+      const api = await getPortableLeetcode()
+      const result = await api.runQuery(selected.id, query)
       setRunResult(result)
       await refresh()
     } finally {

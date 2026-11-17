@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
+import { getPortableLeetcode } from '../bridge'
 import { CodeEditor } from '../components/CodeEditor'
 import { byNumberedTitle } from '../../../shared/order'
 import {
@@ -126,7 +127,8 @@ export function PythonPractice({ track }: { track: PythonTrack }): ReactElement 
     if (!exercise) return
     setBusy(true)
     try {
-      const next = await window.portableLeetcode.runLinkedList(exercise.id, code)
+      const api = await getPortableLeetcode()
+      const next = await api.runLinkedList(exercise.id, code)
       setResult(next)
       setSaved((prev) => {
         const already = prev.status[exercise.id]

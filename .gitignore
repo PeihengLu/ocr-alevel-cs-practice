@@ -3,9 +3,12 @@ node_modules/
 
 # Build outputs
 dist/
+dist-tauri/
 out/
 release/
 *.asar
+src/renderer/public/pyodide/
+
 
 # Vite / Electron
 .vite/
