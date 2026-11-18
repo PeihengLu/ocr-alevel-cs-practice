@@ -6,7 +6,7 @@
 import type { PythonExercise } from './linkedList.ts'
 
 const LINEAR = `class LinearQueue:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         self.data = [None] * capacity
         self.front = 0
         self.rear = -1
@@ -14,7 +14,7 @@ const LINEAR = `class LinearQueue:
 `
 
 const CIRCULAR = `class CircularQueue:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         self.data = [None] * capacity
         self.front = 0
         self.rear = -1
@@ -22,14 +22,14 @@ const CIRCULAR = `class CircularQueue:
 `
 
 const NODE = `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 `
 
 const LINKED = `${NODE}
 class LinkedQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         self.front = None
         self.rear = None
 `
@@ -45,7 +45,7 @@ export const QUEUE_EXERCISES: PythonExercise[] = [
 
 Finish __init__ so a new LinearQueue has data as capacity None slots, front 0, rear -1, and size 0.`,
     starterCode: `class LinearQueue:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         # self.data = ...
         # self.front = ...
         # self.rear = ...
@@ -71,7 +71,7 @@ __check("starts empty with rear -1", __t_new)
 
 A linear queue never moves rear backwards. Once rear hits the last index, further enqueues fail even if early slots are empty.`,
     starterCode: `${LINEAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         pass
 `,
     tests: `
@@ -110,7 +110,7 @@ __check("rejects enqueue when capacity is used", __t_full)
 
 Enqueue A then B; dequeue returns A and leaves front at 1.`,
     starterCode: `${LINEAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         if self.size == len(self.data) or self.rear == len(self.data) - 1:
             return False
         self.rear = self.rear + 1
@@ -118,7 +118,7 @@ Enqueue A then B; dequeue returns A and leaves front at 1.`,
         self.size = self.size + 1
         return True
 
-    def dequeue(self):
+    def dequeue(self) -> int | str | None:
         pass
 `,
     tests: `
@@ -152,7 +152,7 @@ Return a tuple: (whether D was accepted, whether E was accepted, q.data).
 
 Use only q.enqueue and q.dequeue.`,
     starterCode: `${LINEAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         if self.size == len(self.data) or self.rear == len(self.data) - 1:
             return False
         self.rear = self.rear + 1
@@ -160,7 +160,7 @@ Use only q.enqueue and q.dequeue.`,
         self.size = self.size + 1
         return True
 
-    def dequeue(self):
+    def dequeue(self) -> int | str | None:
         if self.size == 0:
             return None
         item = self.data[self.front]
@@ -169,7 +169,7 @@ Use only q.enqueue and q.dequeue.`,
         self.size = self.size - 1
         return item
 
-def wasted_after_use(q):
+def wasted_after_use(q: LinearQueue) -> tuple[bool, bool, list]:
     # q already holds A, B, C
     pass
 `,
@@ -198,7 +198,7 @@ __check("E is rejected while early slots stay empty", __t_waste)
 
 Finish __init__ the same way: data as capacity None slots, front 0, rear -1, size 0.`,
     starterCode: `class CircularQueue:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         pass
 `,
     tests: `
@@ -222,7 +222,7 @@ __check("starts empty with rear -1", __t_new)
 
 Full means size == capacity. The modulo wrap reuses early slots.`,
     starterCode: `${CIRCULAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         pass
 `,
     tests: `
@@ -253,7 +253,7 @@ __check("rejects enqueue when size equals capacity", __t_full)
 4. Otherwise set front to (front + 1) % len(self.data).
 5. Return the item.`,
     starterCode: `${CIRCULAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         if self.size == len(self.data):
             return False
         if self.size == 0:
@@ -265,7 +265,7 @@ __check("rejects enqueue when size equals capacity", __t_full)
         self.size = self.size + 1
         return True
 
-    def dequeue(self):
+    def dequeue(self) -> int | str | None:
         pass
 `,
     tests: `
@@ -304,7 +304,7 @@ q is a CircularQueue of capacity 4 holding A, B, C.
 E lands at index 0 because (3 + 1) % 4 == 0. Return q.data.
 Use only q.enqueue and q.dequeue.`,
     starterCode: `${CIRCULAR}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> bool:
         if self.size == len(self.data):
             return False
         if self.size == 0:
@@ -316,7 +316,7 @@ Use only q.enqueue and q.dequeue.`,
         self.size = self.size + 1
         return True
 
-    def dequeue(self):
+    def dequeue(self) -> int | str | None:
         if self.size == 0:
             return None
         item = self.data[self.front]
@@ -329,7 +329,7 @@ Use only q.enqueue and q.dequeue.`,
             self.front = (self.front + 1) % len(self.data)
         return item
 
-def fill_after_dequeue(q):
+def fill_after_dequeue(q: CircularQueue) -> list:
     # q already holds A, B, C
     pass
 `,
@@ -359,7 +359,7 @@ Finish LinkedQueue.__init__ so both front and rear start as None.
 The Node class is already written.`,
     starterCode: `${NODE}
 class LinkedQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 `,
     tests: `
@@ -381,7 +381,7 @@ __check("a new linked queue is empty", __t_empty)
 
 There is no fixed capacity — the queue grows one node at a time.`,
     starterCode: `${LINKED}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> None:
         pass
 `,
     tests: `
@@ -416,7 +416,7 @@ __check("later enqueues extend from rear", __t_order)
 3. If front is now None, the queue is empty — set rear to None as well.
 4. Return the item.`,
     starterCode: `${LINKED}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> None:
         node = Node(item)
         if self.front is None:
             self.front = node
@@ -425,7 +425,7 @@ __check("later enqueues extend from rear", __t_order)
             self.rear.next = node
             self.rear = node
 
-    def dequeue(self):
+    def dequeue(self) -> int | str | None:
         pass
 `,
     tests: `
@@ -459,7 +459,7 @@ __check("removing the last node clears front and rear", __t_last)
 
 If front is None, return None. Otherwise return front.data and leave the links unchanged.`,
     starterCode: `${LINKED}
-    def enqueue(self, item):
+    def enqueue(self, item: int | str) -> None:
         node = Node(item)
         if self.front is None:
             self.front = node
@@ -468,7 +468,7 @@ If front is None, return None. Otherwise return front.data and leave the links u
             self.rear.next = node
             self.rear = node
 
-    def peek(self):
+    def peek(self) -> int | str | None:
         pass
 `,
     tests: `

@@ -25,7 +25,7 @@ export const GRAPH_EXERCISES: PythonExercise[] = [
     prompt: `create(vertices) returns an adjacency-list graph: a dictionary that maps each vertex to an empty neighbour list.
 
 create(["A", "B", "C"]) returns {"A": [], "B": [], "C": []}.`,
-    starterCode: `def create(vertices):
+    starterCode: `def create(vertices: list[str]) -> dict[str, list[str]]:
     pass
 `,
     tests: `
@@ -51,7 +51,7 @@ __check("neighbour lists are separate objects", __t_independent)
 Append b to a's list and a to b's list. Do not add a neighbour that is already present.
 
 An undirected edge is a route both ways, so both lists change.`,
-    starterCode: `def add_edge(graph, a, b):
+    starterCode: `def add_edge(graph: dict[str, list[str]], a: str, b: str) -> None:
     pass
 `,
     tests: `
@@ -80,7 +80,7 @@ __check("does not duplicate an existing neighbour", __t_once)
 Append b to a's list if it is not already there. Leave b's list unchanged.
 
 "A": ["B"] means travel from A to B, and says nothing about B to A.`,
-    starterCode: `def add_arc(graph, a, b):
+    starterCode: `def add_arc(graph: dict[str, list[str]], a: str, b: str) -> None:
     pass
 `,
     tests: `
@@ -109,7 +109,7 @@ __check("does not duplicate an existing neighbour", __t_once)
 Remove b from a's list if present.
 If directed is False, also remove a from b's list.
 If directed is True, change only a's list.`,
-    starterCode: `def remove_edge(graph, a, b, directed):
+    starterCode: `def remove_edge(graph: dict[str, list[str]], a: str, b: str, directed: bool) -> None:
     pass
 `,
     tests: `
@@ -135,7 +135,7 @@ __check("directed remove changes only the from-list", __t_directed)
 
 1. Delete that vertex's own list from the dictionary.
 2. Remove the vertex from every remaining neighbour list.`,
-    starterCode: `def remove_vertex(graph, vertex):
+    starterCode: `def remove_vertex(graph: dict[str, list[str]], vertex: str) -> None:
     pass
 `,
     tests: `${WORKED}
@@ -158,10 +158,10 @@ __check("deletes the vertex and all references to it", __t_remove_e)
 degree(graph, vertex) returns how many edges touch the vertex — the length of its neighbour list.
 
 On an undirected graph, degree is the number of incident edges.`,
-    starterCode: `def neighbours(graph, vertex):
+    starterCode: `def neighbours(graph: dict[str, list[str]], vertex: str) -> list[str]:
     pass
 
-def degree(graph, vertex):
+def degree(graph: dict[str, list[str]], vertex: str) -> int:
     pass
 `,
     tests: `${WORKED}
@@ -194,7 +194,7 @@ Use a list as a queue (append / pop(0)) and a visited set:
 
 Neighbours are already stored in alphabetical order on the worked graph.
 From A the order is A, B, C, D, E.`,
-    starterCode: `def breadth_first(graph, start):
+    starterCode: `def breadth_first(graph: dict[str, list[str]], start: str) -> list[str]:
     pass
 `,
     tests: `${WORKED}
@@ -220,7 +220,7 @@ A common pattern is a recursive helper with a visited set:
 
 From A on the worked graph, the first neighbour is B, then D, then back to B for E, then C.
 Order: A, B, D, E, C.`,
-    starterCode: `def depth_first(graph, start):
+    starterCode: `def depth_first(graph: dict[str, list[str]], start: str) -> list[str]:
     pass
 `,
     tests: `${WORKED}

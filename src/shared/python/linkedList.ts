@@ -12,13 +12,13 @@ export interface PythonExercise {
 }
 
 const NODE = `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 `
 
 const LIST = `class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 `
 
@@ -34,7 +34,7 @@ self is that object. Store two attributes:
 
 None means "no node".`,
     starterCode: `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         # self.data = ...
         # self.next = ...
         pass
@@ -78,7 +78,7 @@ Write build_chain() so it returns the first node of this chain:
 Create three Node objects, set next yourself, and return the node that holds 1.
 The Node class is already written.`,
     starterCode: `${NODE}
-def build_chain():
+def build_chain() -> Node:
     # first = Node(1)
     # ...
     pass
@@ -105,7 +105,7 @@ Finish __init__ so a new LinkedList has self.head = None.
 The Node class is already written.`,
     starterCode: `${NODE}
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 `,
     tests: `
@@ -139,7 +139,7 @@ Do this even when the list is empty (head is None).
 After insert_front(1) then insert_front(2), the chain is 2 → 1 → None.`,
     starterCode: `${NODE}
 ${LIST}
-    def insert_front(self, data):
+    def insert_front(self, data: int | str) -> None:
         pass
 `,
     tests: `
@@ -175,7 +175,7 @@ Otherwise leave head on the first node. Walk a second name, current, until curre
 After append(1) then append(2) then append(3), the chain is 1 → 2 → 3 → None.`,
     starterCode: `${NODE}
 ${LIST}
-    def append(self, data):
+    def append(self, data: int | str) -> None:
         pass
 `,
     tests: `
@@ -211,7 +211,7 @@ An empty list returns [].
 Example: 1 → 2 → 3 becomes [1, 2, 3].`,
     starterCode: `${NODE}
 ${LIST}
-    def to_list(self):
+    def to_list(self) -> list[int | str]:
         pass
 `,
     tests: `
@@ -252,7 +252,7 @@ Walk from head the same way as to_list. Compare with ==.
 An empty list does not contain anything, so return False.`,
     starterCode: `${NODE}
 ${LIST}
-    def contains(self, data):
+    def contains(self, data: int | str) -> bool:
         pass
 `,
     tests: `
@@ -298,7 +298,7 @@ If the value is not in the list, change nothing.
 If the list is empty, do nothing.`,
     starterCode: `${NODE}
 ${LIST}
-    def delete(self, data):
+    def delete(self, data: int | str) -> None:
         pass
 `,
     tests: `
@@ -381,7 +381,7 @@ Walk from head until None, counting as you go.
 An empty list has length 0. Do not use a Python len() on the nodes — there is nothing to call len() on until you walk them yourself.`,
     starterCode: `${NODE}
 ${LIST}
-    def length(self):
+    def length(self) -> int:
         pass
 `,
     tests: `

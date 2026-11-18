@@ -1,18 +1,18 @@
 /** Full editor contents that pass each tree exercise. Used by the smoke test only. */
 export const TREE_SOLUTIONS: Record<string, string> = {
   'tr-node': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 `,
   'tr-build': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def build_tree():
+def build_tree() -> Node:
     root = Node("A")
     root.left = Node("B")
     root.right = Node("C")
@@ -21,45 +21,45 @@ def build_tree():
     return root
 `,
   'tr-preorder': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def pre_order(node):
+def pre_order(node: Node | None) -> list[int | str]:
     if node is None:
         return []
     return [node.data] + pre_order(node.left) + pre_order(node.right)
 `,
   'tr-inorder': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def in_order(node):
+def in_order(node: Node | None) -> list[int | str]:
     if node is None:
         return []
     return in_order(node.left) + [node.data] + in_order(node.right)
 `,
   'tr-postorder': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def post_order(node):
+def post_order(node: Node | None) -> list[int | str]:
     if node is None:
         return []
     return post_order(node.left) + post_order(node.right) + [node.data]
 `,
   'tr-bfs': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def breadth_first(root):
+def breadth_first(root: Node | None) -> list[int | str]:
     if root is None:
         return []
     order = []
@@ -74,12 +74,12 @@ def breadth_first(root):
     return order
 `,
   'tr-search': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def search(node, key):
+def search(node: Node | None, key: int) -> Node | None:
     if node is None:
         return None
     if key == node.data:
@@ -89,12 +89,12 @@ def search(node, key):
     return search(node.right, key)
 `,
   'tr-insert': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def insert(node, key):
+def insert(node: Node | None, key: int) -> Node:
     if node is None:
         return Node(key)
     if key < node.data:
@@ -104,12 +104,12 @@ def insert(node, key):
     return node
 `,
   'tr-delete-simple': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def delete(node, key):
+def delete(node: Node | None, key: int) -> Node | None:
     if node is None:
         return None
     if key < node.data:
@@ -124,12 +124,12 @@ def delete(node, key):
     return node
 `,
   'tr-delete-two': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
 
-def delete(node, key):
+def delete(node: Node | None, key: int) -> Node | None:
     if node is None:
         return None
     if key < node.data:

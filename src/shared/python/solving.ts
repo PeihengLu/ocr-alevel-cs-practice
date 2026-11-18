@@ -19,7 +19,7 @@ Start result as an empty list. For each value in items, append that value to res
 Trace [10, 20]. result starts as []. The first visit appends 10. The second visit appends 20. Then there is no next value, so the loop stops.
 
 [] never enters the loop, so result stays [].`,
-    starterCode: `def copied(items):
+    starterCode: `def copied(items: list) -> list:
     # result starts empty, then one append per value
     pass
 `,
@@ -53,7 +53,7 @@ The thing you remember has to live outside the loop. A name created inside the l
 
 An empty list never visits, so the total stays 0.
 [1, 2, 3] goes 0, then 1, then 3, then 6.`,
-    starterCode: `def total(items):
+    starterCode: `def total(items: list[int]) -> int:
     # total starts at 0, before the loop
     pass
 `,
@@ -85,7 +85,7 @@ This is a total again. count starts at 0 before the loop. Each visit adds 1, wha
 Count by visiting each value. Do not call len.
 
 [] is 0. ["a", "b", "c"] is 3.`,
-    starterCode: `def how_many(items):
+    starterCode: `def how_many(items: list) -> int:
     # count starts at 0 and grows by 1 per visit
     pass
 `,
@@ -103,7 +103,7 @@ __check("counts every visit", __t_some)
 
 def __t_visits():
     class Bag:
-        def __init__(self):
+        def __init__(self) -> None:
             self._values = ["a", "b", "c"]
         def __iter__(self):
             return iter(self._values)
@@ -123,7 +123,7 @@ Same walk as copied. The body is the part that changes: append value * 2, not va
 
 Leave items as it was. Build a new list.
 [1, 2, 3] returns [2, 4, 6]. [] returns [].`,
-    starterCode: `def doubled(items):
+    starterCode: `def doubled(items: list[int]) -> list[int]:
     # a new list, one doubled value per visit
     pass
 `,
@@ -157,7 +157,7 @@ export const DECIDE_EXERCISES: PythonExercise[] = [
 Walk the list the same way as a total. On each visit, ask one question: is this value equal to target? Add 1 only when the answer is yes.
 
 [] returns 0. [1, 2, 1] with target 1 returns 2. [1, 2, 3] with target 9 returns 0.`,
-    starterCode: `def count_matches(items, target):
+    starterCode: `def count_matches(items: list, target: int | str) -> int:
     # count starts at 0; add 1 only on a match
     pass
 `,
@@ -187,7 +187,7 @@ __check("returns 0 when nothing matches", __t_none)
 Walk the list. Append a value only when it is greater than 0. Zero and negative numbers stay out.
 
 [] returns []. [3, -1, 0, 2] returns [3, 2].`,
-    starterCode: `def positives(items):
+    starterCode: `def positives(items: list[int]) -> list[int]:
     # new list; append only when the value is greater than 0
     pass
 `,
@@ -223,7 +223,7 @@ __check("leaves the original list unchanged", __t_leaves)
 You can stop once the answer is known. When a value equals target, return True immediately. Later values do not matter. If the loop finishes with no match, return False.
 
 [] returns False. [4, 5, 6] with target 5 returns True. [4, 5, 6] with target 9 returns False.`,
-    starterCode: `def contains(items, target):
+    starterCode: `def contains(items: list, target: int | str) -> bool:
     # return True on the first match, False if the loop finishes
     pass
 `,
@@ -255,7 +255,7 @@ Return False as soon as one value fails the test. If the loop finishes, every va
 
 An empty list has no failing value, so it returns True.
 [1, 2] returns True. [1, -2] returns False. [] returns True.`,
-    starterCode: `def all_positive(items):
+    starterCode: `def all_positive(items: list[int]) -> bool:
     # return False on the first failing value
     pass
 `,
@@ -290,7 +290,7 @@ If the list is empty, return None before the loop. There is no value to remember
 Otherwise remember the first value in a variable called last. Each visit replaces last with the value you are on. After the loop, last is the final value.
 
 [] returns None. [4] returns 4. [4, 5, 6] returns 6.`,
-    starterCode: `def last_item(items):
+    starterCode: `def last_item(items: list) -> int | str | None:
     # empty list returns None; otherwise replace last on each visit
     pass
 `,
@@ -322,7 +322,7 @@ Return None when the list is empty. You need one real value to start from.
 Remember the first value. On each visit, if this value is larger than the one you remember, remember this one instead. Return what you remember.
 
 [3, 9, 4] starts at 3, becomes 9, and stays 9. [-2, -8] returns -2, because -2 is larger.`,
-    starterCode: `def biggest(items):
+    starterCode: `def biggest(items: list[int]) -> int | None:
     # empty list returns None; replace the remembered value when you see a larger one
     pass
 `,
@@ -352,7 +352,7 @@ __check("keeps the larger value, including among negatives", __t_big)
 Same shape as biggest. Start from the first value, and replace the remembered value when you see a smaller one.
 
 [] returns None. [3, 9, 4] returns 3. [-2, -8] returns -8.`,
-    starterCode: `def smallest(items):
+    starterCode: `def smallest(items: list[int]) -> int | None:
     pass
 `,
     tests: `
@@ -390,7 +390,7 @@ Otherwise add 1 to index.
 If the loop finishes, return None.
 
 [10, 20, 30] with target 20 returns 1. [10, 20, 10] with target 10 returns 0. [] returns None.`,
-    starterCode: `def index_of(items, target):
+    starterCode: `def index_of(items: list[int], target: int) -> int | None:
     # index starts at 0 and moves one place at a time
     pass
 `,
@@ -425,7 +425,7 @@ __check("returns None when the value is missing", __t_missing)
 Look at a place and the place after it. index starts at 0. While index + 1 is still inside the list, compare items[index] with items[index + 1]. Equal means return True. Otherwise add 1 to index. If the loop finishes, return False.
 
 [] and [7] have no two neighbors, so they return False. [1, 2, 2] returns True.`,
-    starterCode: `def has_pair(items):
+    starterCode: `def has_pair(items: list[int]) -> bool:
     # compare each place with the next place
     pass
 `,
@@ -457,7 +457,7 @@ __check("equal values that are not neighbors do not count", __t_no)
 [1, 2, 4] returns [3, 6], from 1 + 2 and 2 + 4. Fewer than two values returns [].
 
 index starts at 0. While a next value exists, append items[index] + items[index + 1], then add 1 to index.`,
-    starterCode: `def neighbor_sums(items):
+    starterCode: `def neighbor_sums(items: list[int]) -> list[int]:
     # append each value plus the next one
     pass
 `,
@@ -488,7 +488,7 @@ A string is a sequence of characters. for ch in text visits one character at a t
 count starts at 0. Add 1 when ch equals letter. "A" and "a" are different.
 
 "" returns 0. "aab" with letter "a" returns 2.`,
-    starterCode: `def count_letter(text, letter):
+    starterCode: `def count_letter(text: str, letter: str) -> int:
     # one character per visit
     pass
 `,
@@ -519,7 +519,7 @@ __check("treats A and a as different", __t_case)
 result starts as "". For each character, if it is one of 0123456789, add that character onto result.
 
 "a1b2" returns "12". "abc" returns "". "" returns "".`,
-    starterCode: `def digits_in(text):
+    starterCode: `def digits_in(text: str) -> str:
     # result starts as an empty string
     pass
 `,
@@ -549,7 +549,7 @@ __check("returns an empty string when there are no digits", __t_none)
 This is the neighbor check, on a string. index starts at 0. While index + 1 is still inside the text, compare text[index] with text[index + 1].
 
 "", "a", and "abc" return False. "aa" and "aabc" return True.`,
-    starterCode: `def has_double_letter(text):
+    starterCode: `def has_double_letter(text: str) -> bool:
     # compare each character with the next one
     pass
 `,
@@ -582,7 +582,7 @@ __check("the same letter later on does not count", __t_no)
 words is a list of strings. Walk it. len(word) is how many characters that word has. When a word is long enough, return it immediately. If the loop finishes, return None.
 
 ["cat", "horse"] with n 3 returns "horse". ["ant", "bee"] with n 2 returns "bee". [] returns None.`,
-    starterCode: `def first_long_word(words, n):
+    starterCode: `def first_long_word(words: list[str], n: int) -> str | None:
     # return the first word that is long enough
     pass
 `,
@@ -618,7 +618,7 @@ If n is less than 1, return [] before the loop.
 Otherwise start an empty result. While n is greater than 0, append n, then set n to n - 1.
 
 countdown(3) is [3, 2, 1]. countdown(1) is [1]. countdown(0) is [].`,
-    starterCode: `def countdown(n):
+    starterCode: `def countdown(n: int) -> list[int]:
     # while n is still greater than 0, record it and make it smaller
     pass
 `,
@@ -651,7 +651,7 @@ total starts at 0. k starts at 1. While k is still less than or equal to n, add 
 k is the value you are on, the same job an index has in a list. Each pass moves k closer to the end.
 
 sum_to(4) is 10. sum_to(1) is 1. sum_to(0) is 0.`,
-    starterCode: `def sum_to(n):
+    starterCode: `def sum_to(n: int) -> int:
     # k starts at 1 and moves up until it passes n
     pass
 `,
@@ -684,7 +684,7 @@ count starts at 0. While n is greater than 1, set n to n // 2 and add 1 to count
 1 is already done, so steps_to_one(1) is 0.
 8 goes 8, then 4, then 2, then 1, so steps_to_one(8) is 3.
 Each pass changes n. If n stays the same, the loop never ends.`,
-    starterCode: `def steps_to_one(n):
+    starterCode: `def steps_to_one(n: int) -> int:
     # while n is greater than 1, replace n with n // 2
     pass
 `,
@@ -716,7 +716,7 @@ The outer loop picks one value from left and keeps it. The inner loop, written i
 Finish right before you move on in left.
 products([1, 2], [10, 20]) returns [10, 20, 20, 40].
 If either list is empty, the result is [].`,
-    starterCode: `def products(left, right):
+    starterCode: `def products(left: list[int], right: list[int]) -> list[int]:
     # for each value in left, walk every value in right
     pass
 `,
@@ -746,7 +746,7 @@ __check("one left value pairs with every right value", __t_one)
 For each value in left, walk right. If a value in right equals it, return True. You can stop there. If both loops finish, return False.
 
 [1, 2] and [3, 2] returns True. [1] and [2] returns False. [] and [1] returns False.`,
-    starterCode: `def shares_value(left, right):
+    starterCode: `def shares_value(left: list[int], right: list[int]) -> bool:
     # for each left value, look through right
     pass
 `,
@@ -778,7 +778,7 @@ __check("returns False when the lists are disjoint", __t_no)
 count is created once, before either loop. The outer loop takes one word. The inner loop takes one character of that word and adds 1 when it matches.
 
 ["cat", "a"] with "a" returns 2. [] returns 0. ["dog"] with "a" returns 0.`,
-    starterCode: `def count_in_words(words, letter):
+    starterCode: `def count_in_words(words: list[str], letter: str) -> int:
     # count starts once; each word has its own character loop
     pass
 `,

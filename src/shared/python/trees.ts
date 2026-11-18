@@ -6,7 +6,7 @@
 import type { PythonExercise } from './linkedList.ts'
 
 const NODE = `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.left = None
         self.right = None
@@ -41,7 +41,7 @@ Finish __init__ so Node(5) has:
 
 None means that child is missing.`,
     starterCode: `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         # self.data = ...
         # self.left = ...
         # self.right = ...
@@ -79,7 +79,7 @@ __check("each node keeps its own data", __t_separate)
 Create five Node objects, link left and right yourself, and return the node that holds "A".
 The Node class is already written.`,
     starterCode: `${NODE}
-def build_tree():
+def build_tree() -> Node:
     # root = Node("A")
     # ...
     pass
@@ -114,7 +114,7 @@ On this tree the order is A, B, D, E, C, F:
   D   E   F
 \`\`\``,
     starterCode: `${NODE}
-def pre_order(node):
+def pre_order(node: Node | None) -> list[int | str]:
     pass
 `,
     tests: `${SAMPLE}
@@ -139,7 +139,7 @@ On the same sample tree the order is D, B, E, A, C, F.
 
 On a binary search tree, in-order visits keys from smallest to largest.`,
     starterCode: `${NODE}
-def in_order(node):
+def in_order(node: Node | None) -> list[int | str]:
     pass
 `,
     tests: `${SAMPLE}
@@ -174,7 +174,7 @@ On the sample tree the order is D, E, B, F, C, A.
 
 OCR names post-order as the depth-first tree traversal to apply: children are finished before the node itself.`,
     starterCode: `${NODE}
-def post_order(node):
+def post_order(node: Node | None) -> list[int | str]:
     pass
 `,
     tests: `${SAMPLE}
@@ -201,7 +201,7 @@ Use a list as a queue: append to enqueue, pop(0) to dequeue.
 
 On the sample tree the order is A, B, C, D, E, F.`,
     starterCode: `${NODE}
-def breadth_first(root):
+def breadth_first(root: Node | None) -> list[int | str]:
     pass
 `,
     tests: `${SAMPLE}
@@ -226,7 +226,7 @@ __check("visits level by level", __t_order)
 3. If key is smaller, search the left child.
 4. If key is larger, search the right child.`,
     starterCode: `${NODE}
-def search(node, key):
+def search(node: Node | None, key: int) -> Node | None:
     pass
 `,
     tests: `
@@ -268,7 +268,7 @@ __check("returns None when the key is absent", __t_missing)
 
 Equal keys are not used here — leave the tree unchanged if the key is already present.`,
     starterCode: `${NODE}
-def insert(node, key):
+def insert(node: Node | None, key: int) -> Node:
     pass
 `,
     tests: `
@@ -311,7 +311,7 @@ For this exercise, every deleted node is a leaf or has one child:
 
 Deleting a leaf unhooks it. Deleting a one-child node lets that child take its place.`,
     starterCode: `${NODE}
-def delete(node, key):
+def delete(node: Node | None, key: int) -> Node | None:
     pass
 `,
     tests: `
@@ -360,7 +360,7 @@ When the found node has both left and right:
 
 Example: delete 3 when it has left 1 and right 6 (with 4 and 7 under 6). The successor is 4.`,
     starterCode: `${NODE}
-def delete(node, key):
+def delete(node: Node | None, key: int) -> Node | None:
     pass
 `,
     tests: `

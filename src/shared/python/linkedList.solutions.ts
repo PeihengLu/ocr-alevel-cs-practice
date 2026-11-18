@@ -1,16 +1,16 @@
 /** Full editor contents that pass each linked-list exercise. Used by the smoke test only. */
 export const LINKED_LIST_SOLUTIONS: Record<string, string> = {
   'll-node': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 `,
   'll-link': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
-def build_chain():
+def build_chain() -> Node:
     first = Node(1)
     second = Node(2)
     third = Node(3)
@@ -19,38 +19,38 @@ def build_chain():
     return first
 `,
   'll-list-class': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 `,
   'll-insert-front': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def insert_front(self, data):
+    def insert_front(self, data: int | str) -> None:
         node = Node(data)
         node.next = self.head
         self.head = node
 `,
   'll-append': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def append(self, data):
+    def append(self, data: int | str) -> None:
         node = Node(data)
         if self.head is None:
             self.head = node
@@ -61,15 +61,15 @@ class LinkedList:
         current.next = node
 `,
   'll-to-list': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def to_list(self):
+    def to_list(self) -> list[int | str]:
         values = []
         current = self.head
         while current is not None:
@@ -78,15 +78,15 @@ class LinkedList:
         return values
 `,
   'll-contains': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def contains(self, data):
+    def contains(self, data: int | str) -> bool:
         current = self.head
         while current is not None:
             if current.data == data:
@@ -95,15 +95,15 @@ class LinkedList:
         return False
 `,
   'll-delete': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def delete(self, data):
+    def delete(self, data: int | str) -> None:
         if self.head is None:
             return
         if self.head.data == data:
@@ -117,15 +117,15 @@ class LinkedList:
             current = current.next
 `,
   'll-length': `class Node:
-    def __init__(self, data):
+    def __init__(self, data: int | str) -> None:
         self.data = data
         self.next = None
 
 class LinkedList:
-    def __init__(self):
+    def __init__(self) -> None:
         self.head = None
 
-    def length(self):
+    def length(self) -> int:
         count = 0
         current = self.head
         while current is not None:

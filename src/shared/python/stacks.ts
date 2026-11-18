@@ -6,7 +6,7 @@
 import type { PythonExercise } from './linkedList.ts'
 
 const STACK = `class Stack:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         self.data = [None] * capacity
         self.top = -1
 `
@@ -23,7 +23,7 @@ Finish __init__ so a new Stack has:
 
 Stack(3) should hold [None, None, None] with top -1.`,
     starterCode: `class Stack:
-    def __init__(self, capacity):
+    def __init__(self, capacity: int) -> None:
         # self.data = ...
         # self.top = ...
         pass
@@ -52,10 +52,10 @@ is_full() is True when top is the last index, len(self.data) - 1.
 
 The Stack class is already written. Add both methods.`,
     starterCode: `${STACK}
-    def is_empty(self):
+    def is_empty(self) -> bool:
         pass
 
-    def is_full(self):
+    def is_full(self) -> bool:
         pass
 `,
     tests: `
@@ -97,10 +97,10 @@ __check("top at the last index means full", __t_full)
 Pushing onto a full stack is overflow — reject it.
 After push("X") then push("Y") on a capacity-3 stack, data is ["X", "Y", None] and top is 1.`,
     starterCode: `${STACK}
-    def is_full(self):
+    def is_full(self) -> bool:
         return self.top == len(self.data) - 1
 
-    def push(self, item):
+    def push(self, item: int | str) -> bool:
         pass
 `,
     tests: `
@@ -141,15 +141,15 @@ __check("push on a full stack returns False", __t_overflow)
 Popping an empty stack is underflow — return None.
 After push(1), push(2), pop() returns 2 and leaves 1 on top.`,
     starterCode: `${STACK}
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return self.top == -1
 
-    def push(self, item):
+    def push(self, item: int | str) -> bool:
         self.top = self.top + 1
         self.data[self.top] = item
         return True
 
-    def pop(self):
+    def pop(self) -> int | str | None:
         pass
 `,
     tests: `
@@ -188,15 +188,15 @@ __check("popping the last item leaves the stack empty", __t_empty_again)
 If the stack is empty, return None.
 Otherwise return data[top] and leave top unchanged.`,
     starterCode: `${STACK}
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return self.top == -1
 
-    def push(self, item):
+    def push(self, item: int | str) -> bool:
         self.top = self.top + 1
         self.data[self.top] = item
         return True
 
-    def peek(self):
+    def peek(self) -> int | str | None:
         pass
 `,
     tests: `
@@ -226,20 +226,20 @@ Do not use slicing such as text[::-1] or the built-in reversed.
 "cat" pushes c, a, t. Popping gives t, then a, then c, so the result is "tac".
 "" returns "".`,
     starterCode: `${STACK}
-    def is_empty(self):
+    def is_empty(self) -> bool:
         return self.top == -1
 
-    def is_full(self):
+    def is_full(self) -> bool:
         return self.top == len(self.data) - 1
 
-    def push(self, item):
+    def push(self, item: int | str) -> bool:
         if self.is_full():
             return False
         self.top = self.top + 1
         self.data[self.top] = item
         return True
 
-    def pop(self):
+    def pop(self) -> int | str | None:
         if self.is_empty():
             return None
         item = self.data[self.top]
@@ -247,7 +247,7 @@ Do not use slicing such as text[::-1] or the built-in reversed.
         self.top = self.top - 1
         return item
 
-def reversed_text(text):
+def reversed_text(text: str) -> str:
     # use Stack(len(text) or 1) so there is always a capacity
     pass
 `,

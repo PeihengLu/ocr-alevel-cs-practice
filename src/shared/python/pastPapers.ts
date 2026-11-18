@@ -28,7 +28,7 @@ Example: 25 → remainders 1, 0, 0, 1, 1 → "11001".
 Special case: 0 returns "0".
 
 Skill focus from OCR H046/02 May 2023 (denary-to-binary by remainders).`,
-    starterCode: `def to_binary(n):
+    starterCode: `def to_binary(n: int) -> str:
     # repeated /2 remainders; MSB on the left
     pass
 `,
@@ -61,7 +61,7 @@ __check("handles powers of two and small odds", __t_range)
 Reuse the same remainder method as to_binary once you know the input is allowed. Do not raise an error for out-of-range values — just return None.
 
 Skill focus from OCR H046/02 May 2023 (validate then convert).`,
-    starterCode: `def convert_if_valid(n):
+    starterCode: `def convert_if_valid(n: int) -> str | None:
     # return binary string for 1..255, else None
     pass
 `,
@@ -91,7 +91,7 @@ mean is the arithmetic average (a float is fine). Walk the list once if you can:
 Example: [4, 1, 9, 2] → mean 4.0, smallest 1, largest 9.
 
 Skill focus from OCR H046/02 May 2023 (stats from a list — fix the broken algorithm idea).`,
-    starterCode: `def fixed_stats(values):
+    starterCode: `def fixed_stats(values: list[int]) -> tuple[float, int, int]:
     # return (mean, smallest, largest)
     pass
 `,
@@ -129,7 +129,7 @@ const AS_H046_02_2025: PythonExercise[] = [
 Walk from the start. Compare each element. Stop early once you find a match. An empty array never matches.
 
 Skill focus from OCR H046/02 May 2025 (linear search).`,
-    starterCode: `def linear_search(array, value):
+    starterCode: `def linear_search(array: list, value: int | str) -> bool:
     # True if value is found, else False
     pass
 `,
@@ -158,14 +158,14 @@ __check("returns False when missing or empty", __t_missing)
 
 Skill focus from OCR H046/02 May 2025 (array stack push/pop).`,
     starterCode: `class Stack:
-    def __init__(self):
+    def __init__(self) -> None:
         # capacity 8, empty pointer -1
         pass
 
-    def push(self, item):
+    def push(self, item: int) -> bool:
         pass
 
-    def pop(self):
+    def pop(self) -> int | bool:
         pass
 `,
     tests: `
@@ -202,7 +202,7 @@ __check("rejects a ninth push at capacity 8", __t_full)
 Example: initialise_slots(3) → [["empty", "empty"], ["empty", "empty"], ["empty", "empty"]].
 
 Skill focus from OCR H046/02 May 2025 (2D inventory initialisation).`,
-    starterCode: `def initialise_slots(n):
+    starterCode: `def initialise_slots(n: int) -> list[list[str]]:
     # n rows, 2 columns, each cell "empty"
     pass
 `,
@@ -241,7 +241,7 @@ Pop two values. Add them. Push the sum back. Return nothing (None).
 Assume the stack has at least two numbers.
 
 Skill focus from OCR H446/01 June 2023 (stack calculator addition).`,
-    starterCode: `def apply_add(stack):
+    starterCode: `def apply_add(stack: list[int]) -> None:
     # pop two, push sum
     pass
 `,
@@ -271,7 +271,7 @@ Pop two values. Subtract the first popped value from the second popped value, th
 Example: stack [8, 3] → pop 3, pop 8 → push 8 - 3 → [5].
 
 Skill focus from OCR H446/01 June 2023 (stack calculator subtraction).`,
-    starterCode: `def apply_sub(stack):
+    starterCode: `def apply_sub(stack: list[int]) -> None:
     # first popped subtracted from second
     pass
 `,
@@ -299,7 +299,7 @@ __check("allows a negative result", __t_neg)
 Example: do_check(3178) → 3+1+7+8 = 19 → 9.
 
 Skill focus from OCR H446/01 June 2023 (digit-sum MOD 10).`,
-    starterCode: `def do_check(number):
+    starterCode: `def do_check(number: int) -> int:
     # digit sum, then MOD 10
     pass
 `,
@@ -326,7 +326,7 @@ const A_H446_02_2022: PythonExercise[] = [
     prompt: `linear_search_index(items, target) returns the index of the first match, or -1 if target is not found.
 
 Skill focus from OCR H446/02 June 2022 (linear search).`,
-    starterCode: `def linear_search_index(items, target):
+    starterCode: `def linear_search_index(items: list, target: int | str) -> int:
     # index of target, or -1
     pass
 `,
@@ -352,7 +352,7 @@ __check("returns -1 when not found", __t_missing)
 You may mutate arr in place and also return it, or build a new list — tests only check the returned order.
 
 Skill focus from OCR H446/02 June 2022 (bubble sort).`,
-    starterCode: `def bubble_sort_pass_complete(arr):
+    starterCode: `def bubble_sort_pass_complete(arr: list[int]) -> list[int]:
     # ascending bubble sort; return the sorted list
     pass
 `,
@@ -384,7 +384,7 @@ Otherwise return n + sum_to(n - 1).
 Assume n >= 1.
 
 Skill focus from OCR H446/02 June 2022 (recursive calculate-style sum).`,
-    starterCode: `def sum_to(n):
+    starterCode: `def sum_to(n: int) -> int:
     # recursive 1..n
     pass
 `,
@@ -419,7 +419,7 @@ Each node is a dict with keys "data" and "pointer". A null pointer is -1.
 Start at head. While the current index is not -1, if that node's data equals to_find, return the index. Otherwise follow pointer. If you walk off the list, return -1.
 
 Skill focus from OCR H446/02 June 2023 (linked-list search).`,
-    starterCode: `def find_node(to_find, head, linked_list):
+    starterCode: `def find_node(to_find: str, head: int, linked_list: list[dict[str, str | int]]) -> int:
     # return index of to_find, or -1
     pass
 `,
@@ -458,7 +458,7 @@ Check each character with ord(): digit codes are 48..57 inclusive. Do not use st
 An empty string should return True (no failing character) or False — treat empty as False for this exercise.
 
 Skill focus from OCR H446/02 June 2023 (ASCII digit check).`,
-    starterCode: `def is_integer(s):
+    starterCode: `def is_integer(s: str) -> bool:
     # True only if every char has ord in 48..57
     pass
 `,
@@ -496,7 +496,7 @@ __check("uses 48..57 style digit bounds", __t_ord)
 Example path for 10: 10 → 7 → 6 → 3 → 2 → -1 → 1, final return 29.
 
 Skill focus from OCR H446/02 June 2023 (recursiveAlgorithm).`,
-    starterCode: `def recursive_algorithm(value):
+    starterCode: `def recursive_algorithm(value: int) -> int:
     # base <=0 → 1; even → value + recurse(value-3); odd → value + recurse(value-1)
     pass
 `,
@@ -529,14 +529,14 @@ const A_H446_02_2024: PythonExercise[] = [
 
 Skill focus from OCR H446/02 June 2024 (array stack push at capacity 100).`,
     starterCode: `class Stack100:
-    def __init__(self):
+    def __init__(self) -> None:
         # capacity 100, empty at -1
         pass
 
-    def push(self, data):
+    def push(self, data: int) -> bool:
         pass
 
-    def pop(self):
+    def pop(self) -> int | bool:
         pass
 `,
     tests: `
@@ -570,16 +570,16 @@ Store the three attributes. Provide get_name(), get_type(), and get_value() that
 
 Skill focus from OCR H446/02 June 2024 (Prize OOP).`,
     starterCode: `class Prize:
-    def __init__(self, name, type, value):
+    def __init__(self, name: str, type: str, value: int) -> None:
         pass
 
-    def get_name(self):
+    def get_name(self) -> str:
         pass
 
-    def get_type(self):
+    def get_type(self) -> str:
         pass
 
-    def get_value(self):
+    def get_value(self) -> int:
         pass
 `,
     tests: `
@@ -608,16 +608,16 @@ Expose get_money() and get_experience() for checks.
 
 Skill focus from OCR H446/02 June 2024 (Character.updateValues).`,
     starterCode: `class Character:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         pass
 
-    def update_values(self, stat, amount):
+    def update_values(self, stat: str, amount: int) -> None:
         pass
 
-    def get_money(self):
+    def get_money(self) -> int:
         pass
 
-    def get_experience(self):
+    def get_experience(self) -> int:
         pass
 `,
     tests: `
@@ -652,14 +652,14 @@ pop() returns the removed item. If empty, return False (the paper returns the st
 
 Skill focus from OCR H446/02 June 2025 (stack push/pop, empty pointer -1).`,
     starterCode: `class Stack20:
-    def __init__(self):
+    def __init__(self) -> None:
         # capacity 20, empty pointer -1
         pass
 
-    def push(self, data):
+    def push(self, data: int | str) -> bool:
         pass
 
-    def pop(self):
+    def pop(self) -> int | str | bool:
         pass
 `,
     tests: `
@@ -694,7 +694,7 @@ __check("rejects push when full", __t_full)
 Use array[high] as the pivot. Move every value strictly less than the pivot to the left. Place the pivot in its final index and return that index. Mutate array in place.
 
 Skill focus from OCR H446/02 June 2025 (quicksort partition).`,
-    starterCode: `def partition(array, low, high):
+    starterCode: `def partition(array: list[int], low: int, high: int) -> int:
     # Lomuto: pivot = array[high]; return final pivot index
     pass
 `,
@@ -726,7 +726,7 @@ __check("already ascending keeps pivot at end", __t_sorted)
 Use an early-exit idea: stop when a full pass makes no swaps, and/or shrink the unsorted bound each pass so you do not re-check the settled tail.
 
 Skill focus from OCR H446/02 June 2025 (bubble-sort efficiency).`,
-    starterCode: `def bubble_sort_efficient(arr):
+    starterCode: `def bubble_sort_efficient(arr: list[int]) -> list[int]:
     # ascending; early exit / shrinking bound
     pass
 `,
@@ -754,7 +754,7 @@ const A_H446_02_2021: PythonExercise[] = [
 Return the index of search_value, or -1 if it is not present. Use the classic mid = low + (high - low) // 2 approach and narrow the bounds until found or the range is empty.
 
 Skill focus from OCR H446/02 Nov 2021 (binary search completion).`,
-    starterCode: `def binary_search(data_array, search_value):
+    starterCode: `def binary_search(data_array: list[int], search_value: int) -> int:
     # sorted ascending; return index or -1
     pass
 `,
@@ -787,25 +787,25 @@ Provide:
 
 Skill focus from OCR H446/02 Nov 2021 (House / building OOP write-code).`,
     starterCode: `class House:
-    def __init__(self, floors, width, height, bedrooms, bathrooms):
+    def __init__(self, floors: int, width: int, height: int, bedrooms: int, bathrooms: int) -> None:
         pass
 
-    def get_floors(self):
+    def get_floors(self) -> int:
         pass
 
-    def get_width(self):
+    def get_width(self) -> int:
         pass
 
-    def get_height(self):
+    def get_height(self) -> int:
         pass
 
-    def get_bedrooms(self):
+    def get_bedrooms(self) -> int:
         pass
 
-    def get_bathrooms(self):
+    def get_bathrooms(self) -> int:
         pass
 
-    def set_floors(self, n):
+    def set_floors(self, n: int) -> bool:
         pass
 `,
     tests: `
@@ -839,7 +839,7 @@ Return True only if every corresponding cell is equal; otherwise False.
 (This is the corrected form of a common exam checkWon-style routine that wrongly returned early on a match.)
 
 Skill focus from OCR H446/02 Nov 2021 (grid comparison / checkWon idea).`,
-    starterCode: `def grids_match(puzzle, answer_grid):
+    starterCode: `def grids_match(puzzle: list[list[int]], answer_grid: list[list[int]]) -> bool:
     # True iff every cell matches
     pass
 `,
